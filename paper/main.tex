@@ -85,7 +85,7 @@ held-out split is stated explicitly.
 \begin{table}[H]
 \centering
 \scriptsize
-\input{tables/scope_status}
+\input{tables/tab_overview_scope_status}
 \caption{Stages reported here; all passed completeness and protocol audits.
 Evaluation steps include the initial design. The Lunar held-out row is a
 separate evaluation of saved controllers, not another BO run.}
@@ -106,7 +106,7 @@ against 97 for Fixed $p=0.2$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/heldout_alpha_by_acquisition.pdf}
+  \includegraphics[width=\textwidth]{figures/fig_acquisition_30d_endpoint_heatmap.pdf}
   \caption{Endpoint improvement over Standard for every objective, acquisition
   and PE arm.}
   \label{fig:acqall}
@@ -115,7 +115,7 @@ against 97 for Fixed $p=0.2$.
 \begin{table}[H]
 \centering
 \small
-\input{tables/alpha_half_vs_reference}
+\input{tables/tab_acquisition_30d_alpha_half_vs_reference}
 \caption{The slowest exponent in the sweep against $\alpha=2/3$.}
 \label{tab:acqall}
 \end{table}
@@ -150,7 +150,7 @@ against 97 for Fixed $p=0.2$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/regret_trajectories.pdf}
+  \includegraphics[width=\textwidth]{figures/fig_acquisition_30d_trajectories.pdf}
   \caption{Inference regret against evaluation step under LogEI (top) and
   GP-TS (bottom); lower is better.}
   \label{fig:trajectories}
@@ -169,7 +169,7 @@ on ten seeds disjoint from them. $\alpha=2/3$ is fixed in advance, not selected.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/acquisition_pilot_vs_heldout.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_acquisition_pilot_vs_heldout.pdf}
   \caption{Decay Uniform $\alpha=2/3$ on the pilot seeds and on the held-out
   seeds.}
   \label{fig:acqreplication}
@@ -178,7 +178,7 @@ on ten seeds disjoint from them. $\alpha=2/3$ is fixed in advance, not selected.
 \begin{table}[H]
 \centering
 \small
-\input{tables/acquisition_pilot_vs_heldout}
+\input{tables/tab_acquisition_pilot_vs_heldout}
 \caption{Pilot and held-out estimates for Decay Uniform $\alpha=2/3$.}
 \label{tab:acqreplication}
 \end{table}
@@ -212,7 +212,7 @@ paired seeds.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/benchmarks_alpha_by_dimension.pdf}
+  \includegraphics[width=\textwidth]{figures/fig_alpha_dimension_heatmap.pdf}
   \caption{Paired improvement for every dimension and exponent on the three
   scalable benchmarks.}
   \label{fig:threebench}
@@ -221,7 +221,7 @@ paired seeds.
 \begin{table}[H]
 \centering
 \small
-\input{tables/best_alpha_by_dimension}
+\input{tables/tab_alpha_best_by_dimension}
 \caption{The exponent with the largest mean improvement at each benchmark and
 dimension.}
 \label{tab:bestalpha}
@@ -244,7 +244,7 @@ dimension.}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/benchmark_trajectories.pdf}
+  \includegraphics[width=\textwidth]{figures/fig_alpha_dimension_trajectories.pdf}
   \caption{Inference regret against evaluation step at $d=5$ and $d=30$;
   lower is better.}
   \label{fig:benchtraj}
@@ -306,7 +306,7 @@ fifteen disjoint seeds under identical conditions.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/alpha_selection_heldout.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_alpha_selection_heldout.pdf}
   \caption{Pilot estimate and held-out estimate for the selected exponent at
   each dimension.}
   \label{fig:confirmation}
@@ -315,7 +315,7 @@ fifteen disjoint seeds under identical conditions.
 \begin{table}[H]
 \centering
 \small
-\input{tables/confirmation_heldout}
+\input{tables/tab_alpha_confirmation_heldout}
 \caption{Pilot versus held-out improvement for the selected exponent.}
 \label{tab:confirmation}
 \end{table}
@@ -336,7 +336,7 @@ seeds 0--19 and evaluated on seeds 20--34, which were not used for selection.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/selection_on_fresh_seeds.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_alpha_selection_fresh_seeds.pdf}
   \caption{Estimate on the twenty selection seeds and on the fifteen untouched
   seeds, for the exponent chosen at each dimension.}
   \label{fig:freshselection}
@@ -345,7 +345,7 @@ seeds 0--19 and evaluated on seeds 20--34, which were not used for selection.
 \begin{table}[H]
 \centering
 \small
-\input{tables/selection_fresh}
+\input{tables/tab_alpha_selection_fresh}
 \caption{The selected exponent and a pre-fixed $\alpha=1/2$, both scored on
 seeds 20--34.}
 \label{tab:selectionfresh}
@@ -372,7 +372,7 @@ seeds 20--34.}
 \begin{table}[H]
 \centering
 \small
-\input{tables/seed_blocks}
+\input{tables/tab_alpha_seed_blocks}
 \caption{The same cell, $\alpha=1/2$, estimated on two disjoint seed blocks.}
 \label{tab:seedblocks}
 \end{table}
@@ -413,7 +413,7 @@ report return directly because 200 is a success threshold, not the true optimum.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/lunar_returns.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_lunar_returns.pdf}
   \caption{How much each PE policy changes the final return. Positive values
   favor PE. Right-hand numbers are solved runs out of 30.}
   \label{fig:lunarreturns}
@@ -422,7 +422,7 @@ report return directly because 200 is a success threshold, not the true optimum.
 \begin{table}[H]
 \centering
 \small
-\input{tables/lunar_logei}
+\input{tables/tab_lunar_logei}
 \caption{LogEI results. Each improvement is compared with Standard using the
 same 30 seeds. PE queries exclude the 24 initial evaluations.}
 \label{tab:lunarlogei}
@@ -449,7 +449,7 @@ same 30 seeds. PE queries exclude the 24 initial evaluations.}
 \begin{table}[H]
 \centering
 \small
-\input{tables/lunar_schedule}
+\input{tables/tab_lunar_schedule}
 \caption{Decay schedules compared directly with Fixed $p=0.2$ under LogEI.}
 \label{tab:lunarschedule}
 \end{table}
@@ -472,7 +472,7 @@ rollouts.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/lunar_heldout_generalization.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_lunar_heldout_generalization.pdf}
   \caption{The LogEI improvement on each run's original 50 episodes and on a
   shared set of 200 unseen episodes. The two estimates are nearly unchanged.}
   \label{fig:lunarheldout}
@@ -481,7 +481,7 @@ rollouts.
 \begin{table}[H]
 \centering
 \scriptsize
-\input{tables/lunar_heldout}
+\input{tables/tab_lunar_heldout}
 \caption{Performance on 200 unseen episodes. ``Episodes $\geq 200$'' is the
 fraction of individual episodes whose return reaches 200. ``Bottom 10\%'' is
 the mean of each controller's 20 lowest returns. A controller is solved when
@@ -502,7 +502,7 @@ found controllers specialised to the 50 episodes used during optimisation.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.667\textwidth]{figures/lunar_logei_trajectory.pdf}
+  \includegraphics[width=0.667\textwidth]{figures/fig_lunar_logei_trajectory.pdf}
   \caption{Mean return of the currently recommended controller as LogEI
   accumulates evaluations. The dotted line is the solved threshold of 200.}
   \label{fig:lunartrajectory}
@@ -532,16 +532,17 @@ minus PE loss. Figure~\ref{fig:yahpo14} shows the paired mean and bootstrap
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{figures/yahpo_14d_endpoint_improvement.pdf}
+  \includegraphics[width=\textwidth]{figures/fig_yahpo_14d_endpoint_improvement.pdf}
   \caption{Endpoint improvement over Standard on the completed 14D YAHPO
-  tasks. Black-edged markers have paired 95\% intervals excluding zero.}
+  tasks. Filled markers have paired 95\% intervals excluding zero; hollow
+  markers have intervals containing zero.}
   \label{fig:yahpo14}
 \end{figure}
 
 \begin{table}[H]
 \centering
 \scriptsize
-\input{tables/yahpo_14d}
+\input{tables/tab_yahpo_14d_endpoint_improvement}
 \caption{Mean endpoint improvement over Standard in 14D YAHPO. Positive values
 favor PE. Deep, bold cells have paired 95\% intervals excluding zero; complete
 intervals and win/tie/loss counts are included in the public result CSV.}

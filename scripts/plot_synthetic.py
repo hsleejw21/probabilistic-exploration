@@ -23,23 +23,19 @@ import numpy as np
 import pandas as pd
 
 from probabilistic_exploration.benchmarks import BENCHMARKS, FIGURE_ORDER
-from probabilistic_exploration.config import AVAILABLE_POLICIES, FIGURE_SPECS, POLICY_LABELS
-
-
-COLORS = {
-    "standard": "#d62728",
-    "fixed_p010": "#9467bd",
-    "fixed_p020": "#ff7f0e",
-    "fixed_p030": "#17becf",
-    "fixed_uniform": "#1f77b4",
-    "fixed_mvr": "#17becf",
-    "decay_uniform": "#2ca02c",
-    "decay_mvr": "#8c564b",
-    "decay_uniform_a1": "#bcbd22",
-    "decay_mvr_a1": "#e377c2",
-    "decay_uniform_a4_3": "#7f7f7f",
-    "decay_mvr_a4_3": "#000000",
-}
+from probabilistic_exploration.config import (
+    AVAILABLE_POLICIES,
+    FIGURE_SPECS,
+    POLICY_LABELS as CONFIG_POLICY_LABELS,
+)
+from probabilistic_exploration.plot_style import (
+    ACQUISITION_LABELS,
+    POLICY_COLORS as COLORS,
+    POLICY_LABELS,
+    apply_publication_style,
+    save_figure,
+    style_axis,
+)
 
 PLOT_POLICY_ORDER = (
     "standard",
@@ -55,18 +51,12 @@ PLOT_POLICY_ORDER = (
     "decay_uniform_a4_3",
     "decay_mvr_a4_3",
 )
-
-ACQUISITION_LABELS = {
-    "random_search": "Random Search",
-    "ucb": "GP-UCB",
-    "ts": "GP-TS",
-    "ts_rff": "RFF GP-TS",
-    "ei": "EI",
-    "logei": "LogEI",
-    "mes_gumbel": "MES-G",
-    "kg": "KG",
+TRAJECTORY_STEMS = {
+    ("ucb", "increasing"): "fig_synthetic_ucb_increasing_trajectories",
+    ("ts", "constant"): "fig_synthetic_ts_constant_trajectories",
+    ("ucb", "constant"): "fig_synthetic_ucb_constant_trajectories",
+    ("ts", "increasing"): "fig_synthetic_ts_increasing_trajectories",
 }
-
 
 def uncertainty_width(values: np.ndarray, mode: str) -> np.ndarray:
     if values.shape[0] <= 1:
@@ -139,8 +129,11 @@ def plot_regret_grid(
                 iterations,
                 mean,
                 color=COLORS.get(policy),
-                label=POLICY_LABELS.get(policy, policy),
+                label=POLICY_LABELS.get(
+                    policy, CONFIG_POLICY_LABELS.get(policy, policy)
+                ),
                 linewidth=2.5 if policy == "standard" else 1.9,
+                linestyle="--" if policy == "standard" else "-",
                 zorder=4 if policy == "standard" else 3,
             )
             if not sensitivity_plot:
@@ -162,7 +155,7 @@ def plot_regret_grid(
             )
         axis.set_xlabel(x_label)
         axis.set_ylabel(r"$f(x^*) - f(\hat{x}_t)$")
-        axis.grid(alpha=0.25)
+        style_axis(axis, grid_axis="both")
         if not sensitivity_plot:
             axis.legend(fontsize=8)
     for axis in axes.flat[len(present):]:
@@ -181,10 +174,11 @@ def plot_regret_grid(
     else:
         fig.tight_layout()
 
-    reverse_specs = {value: key for key, value in FIGURE_SPECS.items()}
-    stem = reverse_specs.get((acquisition, beta_mode), f"regret_{acquisition}_{beta_mode}")
-    fig.savefig(output_dir / f"{stem}.png", dpi=180, bbox_inches="tight")
-    fig.savefig(output_dir / f"{stem}.pdf", bbox_inches="tight")
+    stem = TRAJECTORY_STEMS.get(
+        (acquisition, beta_mode),
+        f"fig_synthetic_{acquisition}_{beta_mode}_trajectories",
+    )
+    save_figure(fig, output_dir, stem)
     plt.close(fig)
 
 
@@ -195,7 +189,7 @@ def plot_paired_delta_grid(
     beta_mode: str,
     uncertainty: str,
 ) -> None:
-    """Plot seed-paired regret differences; negative values favor PE."""
+    """Plot seed-paired regret improvements; positive values favor PE."""
     selected = history[
         (history["acquisition"] == acquisition)
         & (history["beta_mode"] == beta_mode)
@@ -225,8 +219,8 @@ def plot_paired_delta_grid(
             if shared_seeds.empty or shared_steps.empty:
                 continue
             differences = (
-                policy_values.loc[shared_seeds, shared_steps]
-                - standard.loc[shared_seeds, shared_steps]
+                standard.loc[shared_seeds, shared_steps]
+                - policy_values.loc[shared_seeds, shared_steps]
             ).to_numpy(dtype=float)
             mean = np.mean(differences, axis=0)
             width = uncertainty_width(differences, uncertainty)
@@ -235,7 +229,9 @@ def plot_paired_delta_grid(
                 steps,
                 mean,
                 color=COLORS.get(policy),
-                label=POLICY_LABELS.get(policy, policy),
+                label=POLICY_LABELS.get(
+                    policy, CONFIG_POLICY_LABELS.get(policy, policy)
+                ),
                 linewidth=1.9,
             )
             axis.fill_between(
@@ -249,8 +245,8 @@ def plot_paired_delta_grid(
         axis.axhline(0.0, color="black", linestyle="--", linewidth=1.0)
         axis.set_title(BENCHMARKS[objective].display_name)
         axis.set_xlabel("BO iteration")
-        axis.set_ylabel("Regret difference vs Standard")
-        axis.grid(alpha=0.25)
+        axis.set_ylabel("PE improvement over Standard")
+        style_axis(axis, grid_axis="both")
     for axis in axes.flat[len(present):]:
         axis.set_visible(False)
     handles, labels = axes.flat[0].get_legend_handles_labels()
@@ -262,11 +258,10 @@ def plot_paired_delta_grid(
         bbox_to_anchor=(0.5, 1.0),
         fontsize=9,
     )
-    fig.suptitle("Paired difference: negative values favor PE", y=1.04)
+    fig.suptitle("Paired improvement: positive values favor PE", y=1.04)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
-    stem = f"paired_delta_{acquisition}_{beta_mode}"
-    fig.savefig(output_dir / f"{stem}.png", dpi=180, bbox_inches="tight")
-    fig.savefig(output_dir / f"{stem}.pdf", bbox_inches="tight")
+    stem = f"fig_paired_improvement_{acquisition}_{beta_mode}"
+    save_figure(fig, output_dir, stem)
     plt.close(fig)
 
 
@@ -320,23 +315,26 @@ def plot_final_regret_grid(
             )
         axis.set_xticks(positions)
         axis.set_xticklabels(
-            [POLICY_LABELS.get(policy, policy) for policy in policies],
+            [
+                POLICY_LABELS.get(policy, CONFIG_POLICY_LABELS.get(policy, policy))
+                for policy in policies
+            ],
             rotation=25,
             ha="right",
         )
         axis.set_title(BENCHMARKS[objective].display_name)
         axis.set_ylabel("Final inference regret")
-        axis.grid(axis="y", alpha=0.25)
+        style_axis(axis, grid_axis="y")
     for axis in axes.flat[len(present):]:
         axis.set_visible(False)
     fig.tight_layout()
-    stem = f"final_regret_{acquisition}_{beta_mode}"
-    fig.savefig(output_dir / f"{stem}.png", dpi=180, bbox_inches="tight")
-    fig.savefig(output_dir / f"{stem}.pdf", bbox_inches="tight")
+    stem = f"fig_final_regret_{acquisition}_{beta_mode}"
+    save_figure(fig, output_dir, stem)
     plt.close(fig)
 
 
 def main() -> int:
+    apply_publication_style()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results_dir", type=Path)
     parser.add_argument("--output-dir", type=Path, default=None)

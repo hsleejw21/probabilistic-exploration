@@ -6,13 +6,29 @@ from __future__ import annotations
 import argparse
 import csv
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_DIR = REPOSITORY_ROOT / "src"
+if str(SOURCE_DIR) not in sys.path:
+    sys.path.insert(0, str(SOURCE_DIR))
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+from probabilistic_exploration.plot_style import (
+    ACQUISITION_LABELS,
+    ACQUISITION_ORDER,
+    POLICY_COLORS as COLORS,
+    POLICY_LABELS as LABELS,
+    apply_publication_style,
+    save_figure,
+    style_axis,
+)
 
 
 POLICY_ORDER = (
@@ -20,28 +36,6 @@ POLICY_ORDER = (
     "fixed_uniform", "decay_uniform_grid_a1_2", "decay_uniform",
     "decay_uniform_a1",
 )
-COLORS = {
-    "standard": "#d62728",
-    "fixed_p010": "#9467bd",
-    "fixed_p020": "#ff7f0e",
-    "fixed_p030": "#17becf",
-    "fixed_uniform": "#1f77b4",
-    "decay_uniform_grid_a1_2": "#86b6ef",
-    "decay_uniform": "#2ca02c",
-    "decay_uniform_a1": "#104281",
-}
-LABELS = {
-    "standard": "Standard",
-    "fixed_p010": "Fixed p=0.1",
-    "fixed_p020": "Fixed p=0.2",
-    "fixed_p030": "Fixed p=0.3",
-    "fixed_uniform": "Paper Fixed (p=0.2/0.5)",
-    "decay_uniform_grid_a1_2": "Decay alpha=1/2",
-    "decay_uniform": "Paper Decay",
-    "decay_uniform_a1": "Decay alpha=1",
-}
-
-
 def confidence_width(values: np.ndarray) -> float:
     if len(values) <= 1:
         return 0.0
@@ -104,11 +98,13 @@ def plot_endpoint_summary(
         )
         axis.set_title(task.replace("_", " "))
         axis.set_ylabel(ylabel)
-        axis.grid(axis="y", alpha=0.25)
-    fig.suptitle(f"{acquisition.upper()}: endpoint comparison", y=1.02)
+        style_axis(axis, grid_axis="y")
+    fig.suptitle(
+        f"{ACQUISITION_LABELS.get(acquisition, acquisition)}: endpoint comparison",
+        y=1.02,
+    )
     fig.tight_layout()
-    fig.savefig(output / f"{stem_prefix}_{acquisition}.png", dpi=180)
-    fig.savefig(output / f"{stem_prefix}_{acquisition}.pdf")
+    save_figure(fig, output, f"fig_hpo_{stem_prefix}_{acquisition}")
     plt.close(fig)
 
 
@@ -138,8 +134,8 @@ def plot_paired_endpoint_difference(
         for position, policy in zip(positions, policies):
             differences = np.asarray(
                 [
-                    float(row["best_validation_loss"])
-                    - standard[int(row["seed"])]
+                    standard[int(row["seed"])]
+                    - float(row["best_validation_loss"])
                     for row in relevant
                     if row["policy"] == policy and int(row["seed"]) in standard
                 ],
@@ -162,16 +158,19 @@ def plot_paired_endpoint_difference(
             ha="right",
         )
         axis.set_title(task.replace("_", " "))
-        axis.set_ylabel("Final validation difference vs Standard")
-        axis.grid(axis="y", alpha=0.25)
-    fig.suptitle(f"{acquisition.upper()}: negative values favor PE")
+        axis.set_ylabel("PE improvement over Standard")
+        style_axis(axis, grid_axis="y")
+    fig.suptitle(
+        f"{ACQUISITION_LABELS.get(acquisition, acquisition)}: "
+        "positive values favor PE"
+    )
     fig.tight_layout()
-    fig.savefig(output / f"paired_delta_validation_{acquisition}.png", dpi=180)
-    fig.savefig(output / f"paired_delta_validation_{acquisition}.pdf")
+    save_figure(fig, output, f"fig_hpo_endpoint_improvement_{acquisition}")
     plt.close(fig)
 
 
 def main() -> int:
+    apply_publication_style()
     parser = argparse.ArgumentParser()
     parser.add_argument("result_dir", type=Path)
     parser.add_argument("--output-dir", type=Path, default=None)
@@ -182,7 +181,13 @@ def main() -> int:
         rows = list(csv.DictReader(handle))
     endpoints = endpoint_rows(rows)
     tasks = sorted({row["task"] for row in rows})
-    acquisitions = sorted({row["acquisition"] for row in rows})
+    observed_acquisitions = {row["acquisition"] for row in rows}
+    acquisitions = [
+        acquisition
+        for acquisition in ACQUISITION_ORDER
+        if acquisition in observed_acquisitions
+    ]
+    acquisitions.extend(sorted(observed_acquisitions - set(acquisitions)))
     for acquisition in acquisitions:
         fig, axes = plt.subplots(1, len(tasks), figsize=(5.2 * len(tasks), 4.1), squeeze=False)
         for axis, task in zip(axes[0], tasks):
@@ -204,12 +209,13 @@ def main() -> int:
                     color=COLORS.get(policy),
                     label=LABELS.get(policy, policy),
                     linewidth=2.5 if policy == "standard" else 1.9,
+                    linestyle="--" if policy == "standard" else "-",
                     zorder=4 if policy == "standard" else 3,
                 )
             axis.set_title(task.replace("_", " "))
             axis.set_xlabel("Actual model evaluations")
             axis.set_ylabel("Best validation loss")
-            axis.grid(alpha=0.25)
+            style_axis(axis, grid_axis="both")
         handles, labels = axes[0, 0].get_legend_handles_labels()
         fig.legend(
             handles,
@@ -219,8 +225,7 @@ def main() -> int:
             bbox_to_anchor=(0.5, 1.0),
         )
         fig.tight_layout(rect=(0, 0, 1, 0.82))
-        fig.savefig(output / f"best_validation_loss_{acquisition}.png", dpi=180)
-        fig.savefig(output / f"best_validation_loss_{acquisition}.pdf")
+        save_figure(fig, output, f"fig_hpo_validation_trajectories_{acquisition}")
         plt.close(fig)
         plot_endpoint_summary(
             endpoints,

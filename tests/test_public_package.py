@@ -13,6 +13,13 @@ from probabilistic_exploration.exploration import (
     exploration_rule,
 )
 from probabilistic_exploration.lunar_benchmark import lunar_controller
+from probabilistic_exploration.plot_style import (
+    ACQUISITION_LABELS,
+    ACQUISITION_ORDER,
+    FIXED_ORANGE,
+    POLICY_COLORS,
+    STANDARD_GRAY,
+)
 
 
 def test_decay_probability_decreases_and_alpha_controls_strength():
@@ -54,3 +61,12 @@ def test_knowledge_gradient_is_registered_and_values_information():
         candidate_batch_size=1,
     )
     assert np.isclose(score[0], 1.0 / math.sqrt(2.0 * math.pi), atol=0.01)
+
+
+def test_public_figures_use_stable_semantic_colours_and_labels():
+    assert POLICY_COLORS["standard"] == STANDARD_GRAY
+    assert POLICY_COLORS["fixed_p020"] == FIXED_ORANGE
+    assert POLICY_COLORS["decay_uniform_a1"] == "#104281"
+    assert ACQUISITION_LABELS["ucb"] == "GP-UCB"
+    assert ACQUISITION_LABELS["mes_gumbel"] == "MES-Gumbel"
+    assert ACQUISITION_ORDER[:4] == ("ucb", "ts", "logei", "mes_gumbel")

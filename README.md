@@ -51,5 +51,7 @@ python scripts/run_synthetic.py --profile smoke --jobs 2 --output-dir /tmp/pe-sm
 ```
 
 See [the method](docs/method.md), [experiment index](results/README.md), and
-[reproduction notes](docs/reproducibility.md). The project license has not yet
-been specified; choose one before making the repository public.
+[reproduction notes](docs/reproducibility.md). Public figures and tables follow
+the shared [visual style and file-naming convention](docs/visual_style.md). The
+project license has not yet been specified; choose one before making the
+repository public.

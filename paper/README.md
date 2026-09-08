@@ -13,3 +13,5 @@ tectonic -X compile main.tex
 
 The checked-in `main.pdf` was built from this source. The audited 14D YAHPO
 stage is included; the running 28D and 38D stages are not interpreted.
+Figure and table sources follow the repository-wide naming convention in
+[the visual-style guide](../docs/visual_style.md).

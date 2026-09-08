@@ -36,6 +36,10 @@ The result is useful but not universal:
 
 `paired_improvements_14d.csv` contains all paired means, 95% bootstrap
 intervals, and win/tie/loss counts. `trial_summary_14d.csv` contains one row per
-completed trial. The three trajectory panels and the compact endpoint figure
-are provided in `figures/`. Results from 28D and 38D will be added only after
-their full trial counts pass the same audit.
+completed trial. See the compact
+[endpoint figure](figures/fig_yahpo_14d_endpoint_improvement.pdf) and the 95%
+CI trajectories for [credit-g](figures/fig_yahpo_14d_credit_g_trajectories_ci95.pdf),
+[car](figures/fig_yahpo_14d_car_trajectories_ci95.pdf), and
+[blood transfusion](figures/fig_yahpo_14d_blood_transfusion_trajectories_ci95.pdf).
+Results from 28D and 38D will be added only after their full trial counts pass
+the same audit.
