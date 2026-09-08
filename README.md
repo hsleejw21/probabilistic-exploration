@@ -19,6 +19,9 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
   Higher-dimensional YAHPO experiments are still running and are not yet used
   as evidence.
 
+Knowledge Gradient is implemented as an optional acquisition for a planned
+follow-up, but no KG result is included in the findings yet.
+
 ## Repository map
 
 ```text
