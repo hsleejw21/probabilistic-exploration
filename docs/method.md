@@ -20,3 +20,8 @@ comparisons share the initial design and random conditions within a seed.
 For GP-TS, only the theory-aligned implementation is retained: logarithmic
 \(\beta_t\) and a newly generated Sobol candidate set whose size grows over
 time. Earlier fixed-beta GP-TS runs are intentionally excluded.
+
+The code also provides a finite-set, one-step Knowledge Gradient acquisition
+for planned follow-up experiments. It uses Sobol measurement and terminal
+sets with Gauss-Hermite fantasy quadrature. KG is available as code only and
+is not part of the reported empirical conclusions yet.

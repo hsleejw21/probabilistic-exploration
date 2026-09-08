@@ -2,7 +2,11 @@ import math
 
 import numpy as np
 
-from probabilistic_exploration.acquisitions import beta_value
+from probabilistic_exploration.acquisitions import (
+    acquisition_names,
+    beta_value,
+    discrete_knowledge_gradient,
+)
 from probabilistic_exploration.config import paper_config
 from probabilistic_exploration.exploration import (
     exploration_probability,
@@ -37,3 +41,16 @@ def test_theory_aligned_ts_beta_is_logarithmic():
 def test_lunar_controller_action_is_valid():
     action = lunar_controller(np.zeros(8), np.ones(12))
     assert action in {0, 1, 2, 3}
+
+
+def test_knowledge_gradient_is_registered_and_values_information():
+    assert "kg" in acquisition_names()
+    score = discrete_knowledge_gradient(
+        np.asarray([0.0, 0.0]),
+        np.asarray([[1.0], [0.0]]),
+        np.asarray([1.0]),
+        observation_noise_variance=0.0,
+        num_fantasies=32,
+        candidate_batch_size=1,
+    )
+    assert np.isclose(score[0], 1.0 / math.sqrt(2.0 * math.pi), atol=0.01)

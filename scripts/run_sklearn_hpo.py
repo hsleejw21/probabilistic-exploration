@@ -37,7 +37,8 @@ from probabilistic_exploration.real_world_benchmarks import (
 )
 
 
-ACQUISITIONS = ("ucb", "logei", "ts", "mes_gumbel")
+DEFAULT_ACQUISITIONS = ("ucb", "logei", "ts", "mes_gumbel")
+ACQUISITIONS = DEFAULT_ACQUISITIONS + ("kg",)
 FIELDS = [
     "task", "dataset", "model", "dimension", "acquisition", "beta_mode",
     "policy", "seed", "iteration", "bo_iteration", "event",
@@ -287,7 +288,9 @@ def _write_aggregates(output_dir: Path, budget: int) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tasks", nargs="+", default=["all"])
-    parser.add_argument("--acquisitions", nargs="+", default=list(ACQUISITIONS))
+    parser.add_argument(
+        "--acquisitions", nargs="+", default=list(DEFAULT_ACQUISITIONS)
+    )
     parser.add_argument("--policies", nargs="+", default=["all"])
     parser.add_argument("--num-seeds", type=int, default=3)
     parser.add_argument("--seed-start", type=int, default=0)

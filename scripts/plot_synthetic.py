@@ -64,6 +64,7 @@ ACQUISITION_LABELS = {
     "ei": "EI",
     "logei": "LogEI",
     "mes_gumbel": "MES-G",
+    "kg": "KG",
 }
 
 

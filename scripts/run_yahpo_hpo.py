@@ -38,7 +38,8 @@ from probabilistic_exploration.gp_surrogate import build_gaussian_process
 from probabilistic_exploration.yahpo_benchmarks import YAHPO_TASKS, empirical_target_range, objective_loss
 
 
-ACQUISITIONS = ("ucb", "ts", "logei", "mes_gumbel")
+DEFAULT_ACQUISITIONS = ("ucb", "ts", "logei", "mes_gumbel")
+ACQUISITIONS = DEFAULT_ACQUISITIONS + ("kg",)
 FIELDS = [
     "task", "scenario", "instance", "target", "dimension", "acquisition",
     "beta_mode", "policy", "seed", "iteration", "bo_iteration", "event",
@@ -391,7 +392,9 @@ def _write_trial_summary(output_dir: Path, rows: list[dict[str, str]]) -> None:
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tasks", nargs="+", default=["all"])
-    parser.add_argument("--acquisitions", nargs="+", default=list(ACQUISITIONS))
+    parser.add_argument(
+        "--acquisitions", nargs="+", default=list(DEFAULT_ACQUISITIONS)
+    )
     parser.add_argument(
         "--ucb-beta-modes", nargs="+", choices=["constant", "zero"],
         default=["constant"],
@@ -454,7 +457,11 @@ def main() -> int:
         ),
         "yahpo_data_version": "1.0.2",
         "gp_config_by_dimension": {
-            str(dim): asdict(application_config(dim, args.budget))
+            str(dim): {
+                key: value
+                for key, value in asdict(application_config(dim, args.budget)).items()
+                if "kg" in args.acquisitions or not key.startswith("kg_")
+            }
             for dim in sorted({YAHPO_TASKS[name].dim for name in tasks})
         },
         "software": {

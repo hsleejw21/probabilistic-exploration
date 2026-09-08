@@ -128,6 +128,10 @@ def _build_config(args: argparse.Namespace):
             ts_candidates=32,
             mes_num_max_samples=8,
             mes_num_representer_points=128,
+            kg_num_candidates=16,
+            kg_num_representer_points=32,
+            kg_num_fantasies=8,
+            kg_candidate_batch_size=8,
         )
     return replace(high_dimensional_config(), **updates)
 

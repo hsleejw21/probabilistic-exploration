@@ -123,6 +123,16 @@ class ExperimentConfig:
     mes_representer_design: str = "uniform"
     mes_min_std: float = 1e-10
 
+    # One-step Knowledge Gradient on finite Sobol sets. The expectation over a
+    # scalar fantasy observation uses Gauss-Hermite quadrature, avoiding a
+    # PyTorch/BoTorch dependency while retaining the current exact GP.
+    kg_num_candidates: int = 256
+    kg_num_representer_points: int = 512
+    kg_num_fantasies: int = 32
+    kg_design: str = "sobol"
+    kg_candidate_batch_size: int = 32
+    kg_min_variance: float = 1e-12
+
     # beta schedules.
     beta_constant: float = 2.0             # [PAPER]
     increasing_beta_scale: float = 1.0     # [ASSUMPTION]
@@ -166,6 +176,10 @@ def smoke_config() -> ExperimentConfig:
         variance_candidates=64,
         mes_num_max_samples=8,
         mes_num_representer_points=128,
+        kg_num_candidates=16,
+        kg_num_representer_points=32,
+        kg_num_fantasies=8,
+        kg_candidate_batch_size=8,
     )
 
 

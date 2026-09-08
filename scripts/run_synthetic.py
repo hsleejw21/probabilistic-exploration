@@ -149,6 +149,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--mes-representer-design", choices=["sobol", "uniform"], default=None
     )
+    parser.add_argument("--kg-num-candidates", type=int, default=None)
+    parser.add_argument("--kg-num-representer-points", type=int, default=None)
+    parser.add_argument("--kg-num-fantasies", type=int, default=None)
+    parser.add_argument("--kg-design", choices=["sobol", "uniform"], default=None)
+    parser.add_argument("--kg-candidate-batch-size", type=int, default=None)
+    parser.add_argument("--kg-min-variance", type=float, default=None)
     parser.add_argument("--beta-constant", type=float, default=None)
     parser.add_argument("--increasing-beta-scale", type=float, default=None)
     parser.add_argument("--logarithmic-beta-scale", type=float, default=None)
@@ -208,6 +214,12 @@ def resolve_config(args: argparse.Namespace) -> tuple[ExperimentConfig, int]:
         "mes_num_max_samples": "mes_num_max_samples",
         "mes_num_representer_points": "mes_num_representer_points",
         "mes_representer_design": "mes_representer_design",
+        "kg_num_candidates": "kg_num_candidates",
+        "kg_num_representer_points": "kg_num_representer_points",
+        "kg_num_fantasies": "kg_num_fantasies",
+        "kg_design": "kg_design",
+        "kg_candidate_batch_size": "kg_candidate_batch_size",
+        "kg_min_variance": "kg_min_variance",
         "beta_constant": "beta_constant",
         "increasing_beta_scale": "increasing_beta_scale",
         "logarithmic_beta_scale": "logarithmic_beta_scale",
@@ -233,6 +245,14 @@ def resolve_config(args: argparse.Namespace) -> tuple[ExperimentConfig, int]:
         raise ValueError("center_y and normalize_y cannot both be enabled")
     if config.ts_rff_features < 1:
         raise ValueError("ts_rff_features must be positive")
+    if (
+        config.kg_num_candidates < 1
+        or config.kg_num_representer_points < 1
+        or config.kg_num_fantasies < 2
+        or config.kg_candidate_batch_size < 1
+        or config.kg_min_variance <= 0.0
+    ):
+        raise ValueError("invalid KG discretization or fantasy settings")
     if config.noise_variance < 0.0 or config.resolved_gp_nugget_variance() <= 0.0:
         raise ValueError("noise variance must be non-negative and GP nugget positive")
     if (
@@ -370,6 +390,7 @@ def config_hash(config: ExperimentConfig) -> str:
         name: value
         for name, value in asdict(config).items()
         if not name.startswith("mes_")
+        and not name.startswith("kg_")
         and not name.startswith("ts_rff_")
         and name
         not in {

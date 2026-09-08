@@ -583,6 +583,119 @@ def select_mes_gumbel(context: AcquisitionContext) -> Array:
     )
 
 
+def discrete_knowledge_gradient(
+    decision_mean: Array,
+    decision_candidate_covariance: Array,
+    candidate_variance: Array,
+    *,
+    observation_noise_variance: float,
+    num_fantasies: int,
+    candidate_batch_size: int,
+    min_variance: float = 1e-12,
+) -> Array:
+    """Approximate one-step KG for a finite decision and measurement set.
+
+    For candidate ``j``, a standardized fantasy observation ``Z`` changes the
+    posterior mean at every terminal decision ``i`` by
+
+    ``Cov(f_i, f_j) / sqrt(Var(f_j) + noise) * Z``.
+
+    The scalar Gaussian expectation is evaluated deterministically with
+    Gauss-Hermite quadrature. GP hyperparameters remain fixed within fantasies,
+    which is the usual one-step KG convention.
+    """
+    mean = np.asarray(decision_mean, dtype=float).ravel()
+    cross_covariance = np.asarray(
+        decision_candidate_covariance, dtype=float
+    )
+    measurement_variance = np.asarray(candidate_variance, dtype=float).ravel()
+    if mean.size == 0 or measurement_variance.size == 0:
+        raise ValueError("KG requires non-empty decision and candidate sets")
+    if cross_covariance.shape != (mean.size, measurement_variance.size):
+        raise ValueError("KG cross-covariance has incompatible shape")
+    if not (
+        np.all(np.isfinite(mean))
+        and np.all(np.isfinite(cross_covariance))
+        and np.all(np.isfinite(measurement_variance))
+    ):
+        raise ValueError("KG posterior moments must be finite")
+    if observation_noise_variance < 0.0 or min_variance <= 0.0:
+        raise ValueError("KG variances must be non-negative with a positive floor")
+    if num_fantasies < 2 or candidate_batch_size < 1:
+        raise ValueError("KG needs at least two fantasies and a positive batch size")
+
+    nodes, weights = np.polynomial.hermite.hermgauss(num_fantasies)
+    standard_normal_nodes = math.sqrt(2.0) * nodes
+    normal_weights = weights / math.sqrt(math.pi)
+    predictive_scale = np.sqrt(
+        np.maximum(
+            measurement_variance + float(observation_noise_variance),
+            float(min_variance),
+        )
+    )
+    current_value = float(np.max(mean))
+    scores = np.empty(measurement_variance.size, dtype=float)
+    for start in range(0, measurement_variance.size, candidate_batch_size):
+        stop = min(start + candidate_batch_size, measurement_variance.size)
+        slopes = cross_covariance[:, start:stop] / predictive_scale[None, start:stop]
+        fantasy_means = (
+            mean[:, None, None]
+            + slopes[:, :, None] * standard_normal_nodes[None, None, :]
+        )
+        fantasy_values = np.max(fantasy_means, axis=0)
+        scores[start:stop] = fantasy_values @ normal_weights - current_value
+    # Exact KG is non-negative by Jensen's inequality. Clip only tiny numerical
+    # quadrature/covariance errors, not the posterior moments themselves.
+    return np.maximum(scores, 0.0)
+
+
+def select_kg(context: AcquisitionContext) -> Array:
+    """Select a q=1 discrete Knowledge Gradient measurement."""
+    config = context.config
+    if config.kg_num_candidates < 1 or config.kg_num_representer_points < 1:
+        raise ValueError("KG candidate and representer counts must be positive")
+    candidates = _random_design(
+        config.kg_num_candidates,
+        context.dim,
+        context.rng,
+        config.kg_design,
+    )
+    representers = _random_design(
+        config.kg_num_representer_points,
+        context.dim,
+        context.rng,
+        config.kg_design,
+    )
+    training_inputs = np.asarray(
+        getattr(context.gp, "training_inputs", np.empty((0, context.dim))),
+        dtype=float,
+    ).reshape(-1, context.dim)
+    # Candidates are also terminal decisions so the value of measuring a point
+    # is not understated when that same point becomes the best recommendation.
+    decision_points = np.vstack((representers, training_inputs, candidates))
+    decision_mean, decision_covariance = context.gp.predict(
+        decision_points, return_covariance=True
+    )
+    candidate_start = len(decision_points) - len(candidates)
+    candidate_indices = np.arange(candidate_start, len(decision_points))
+    cross_covariance = decision_covariance[:, candidate_indices]
+    candidate_variance = np.diag(decision_covariance)[candidate_indices]
+    observation_noise_variance = (
+        context.gp.internal_noise_variance
+        * context.gp.posterior_output_scale**2
+    )
+    scores = discrete_knowledge_gradient(
+        decision_mean,
+        cross_covariance,
+        candidate_variance,
+        observation_noise_variance=observation_noise_variance,
+        num_fantasies=config.kg_num_fantasies,
+        candidate_batch_size=config.kg_candidate_batch_size,
+        min_variance=config.kg_min_variance,
+    )
+    return candidates[int(np.argmax(scores))].copy()
+
+
 # The registry is the only list consumed by the CLI and trial runner.  Future
 # acquisition functions should be added here with their optimizer made explicit.
 ACQUISITIONS: dict[str, AcquisitionDefinition] = {
@@ -634,6 +747,13 @@ ACQUISITIONS: dict[str, AcquisitionDefinition] = {
         description="stable analytic log expected improvement over best observed y",
         beta_modes=("native",),
     ),
+    "kg": AcquisitionDefinition(
+        name="kg",
+        selector=select_kg,
+        optimization="finite_sobol_one_step_gauss_hermite",
+        description="q=1 one-step Knowledge Gradient on finite Sobol sets",
+        beta_modes=("native",),
+    ),
     "mes_gumbel": AcquisitionDefinition(
         name="mes_gumbel",
         selector=select_mes_gumbel,
@@ -680,6 +800,18 @@ def acquisition_settings(
             "gumbel_fit_quantiles": [0.25, 0.50, 0.75],
             "outer_optimizer": "scipy_multistart_l_bfgs_b",
             "outer_optimizer_restarts": config.optimizer_restarts,
+        }
+    if name == "kg":
+        return {
+            "implementation": "discrete_one_step_kg_gauss_hermite_v1",
+            "num_candidates": config.kg_num_candidates,
+            "num_representer_points": config.kg_num_representer_points,
+            "num_fantasies": config.kg_num_fantasies,
+            "design": config.kg_design,
+            "candidate_batch_size": config.kg_candidate_batch_size,
+            "min_variance": config.kg_min_variance,
+            "fantasy_hyperparameters": "fixed",
+            "observation_noise": "fitted_gp_nugget_in_objective_units",
         }
     if name == "ts_rff":
         return {
