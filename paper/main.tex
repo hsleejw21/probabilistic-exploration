@@ -50,8 +50,10 @@ multiple 30D objectives. With the theory-aligned GP-TS implementation, the
 benefit repeats on Rosenbrock but not on Bent Cigar or Sparse Hartmann. Useful exponents are usually between
 $1/2$ and $1$, yet neither dimension nor a small seed sweep identifies a
 reliable winner. On Lunar Lander, Decay PE gives a clear and transferable gain
-with LogEI. The current evidence therefore supports PE as a useful option, but
-does not yet support a universal rule for choosing $\alpha$.
+with LogEI. In 14D YAHPO tuning, Decay PE helps several UCB, LogEI, and MES
+settings, mainly by reducing high-loss failures on one dataset, but does not
+help GP-TS consistently. The current evidence therefore supports PE as a
+useful option, but does not yet support a universal rule for choosing $\alpha$.
 
 \textbf{Protocol.} GP signal variance fixed to $1$ and not learned, so
 $k(x,x)\le 1$; lengthscales learned; GP inputs mapped to $[0,1]^d$; scrambled
@@ -517,11 +519,46 @@ significant held-out test-loss improvement over Standard. The result is useful
 as a negative transfer check: the current evidence does not support claiming
 that PE helps every HPO problem.
 
-A higher-dimensional YAHPO study is in progress on 14D, 28D, and 38D surrogate
-benchmarks. It uses GP-UCB, LogEI, theory-aligned GP-TS, and MES-Gumbel with
-Standard, decay $\alpha=1/2$, decay $\alpha=1$, and Fixed $p=0.2$. Every
-dimension uses ten initial points, thirty confirmation seeds, and respectively
-120, 200, and 250 evaluations. Because that study is incomplete, this report
-records its protocol but draws no conclusion from partial runs.
+The higher-dimensional YAHPO study uses GP-UCB, LogEI, theory-aligned GP-TS,
+and MES-Gumbel with Standard, decay $\alpha=1/2$, decay $\alpha=1$, and Fixed
+$p=0.2$. Every dimension uses ten initial points and thirty paired confirmation
+seeds. The completed 14D stage covers three XGBoost tasks and 120 evaluations,
+for 1,440 audited trials. The 28D and 38D stages use 200 and 250 evaluations and
+remain in progress; no partial result from either stage is interpreted here.
+
+Because YAHPO reports validation log loss, its improvement is Standard loss
+minus PE loss. Figure~\ref{fig:yahpo14} shows the paired mean and bootstrap
+95\% interval under the same positive-is-better convention used elsewhere.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/yahpo_14d_endpoint_improvement.pdf}
+  \caption{Endpoint improvement over Standard on the completed 14D YAHPO
+  tasks. Black-edged markers have paired 95\% intervals excluding zero.}
+  \label{fig:yahpo14}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/yahpo_14d}
+\caption{Mean endpoint improvement over Standard in 14D YAHPO. Positive values
+favor PE. Deep, bold cells have paired 95\% intervals excluding zero; complete
+intervals and win/tie/loss counts are included in the public result CSV.}
+\label{tab:yahpo14}
+\end{table}
+
+Across the 24 decay-policy comparisons, 5 improve significantly, 1 is
+significantly worse, and 18 are inconclusive. The clearest pattern is on
+\texttt{car}: $\alpha=1/2$ improves LogEI by $0.0527$
+$[0.0100,0.1045]$, MES-Gumbel by $0.0800$ $[0.0224,0.1455]$, and GP-UCB by
+$0.0973$ $[0.0418,0.1584]$. The median is not uniformly improved; the mean gain
+comes mainly from reducing the high-loss tail. On \texttt{blood transfusion},
+$\alpha=1$ improves MES-Gumbel and GP-UCB by $0.0067$ and $0.0041$,
+respectively. No comparison is conclusive on \texttt{credit-g}. GP-TS shows no
+reliable gain and is worse with $\alpha=1/2$ on \texttt{blood transfusion} by
+$0.0084$ $[0.0052,0.0117]$. Finally, Fixed $p=0.2$ also improves UCB, LogEI,
+and MES-Gumbel on \texttt{car}; this stage supports problem-dependent explicit
+exploration, but does not establish that decay always beats a fixed rate.
 
 \end{document}

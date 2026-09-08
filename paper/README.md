@@ -11,5 +11,5 @@ Compile with Tectonic:
 tectonic -X compile main.tex
 ```
 
-The checked-in `main.pdf` was built from this source. YAHPO is listed only as
-in progress; its partial runs are not interpreted.
+The checked-in `main.pdf` was built from this source. The audited 14D YAHPO
+stage is included; the running 28D and 38D stages are not interpreted.

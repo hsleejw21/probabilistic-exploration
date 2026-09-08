@@ -27,10 +27,75 @@ LABELS = {
     "decay_uniform_a1": "Decay alpha=1",
     "fixed_p020": "Fixed p=0.2",
 }
+TASK_LABELS = {
+    "rbv2_xgboost_31": "credit-g",
+    "rbv2_xgboost_40975": "car",
+    "rbv2_xgboost_1464": "blood transfusion",
+}
 POLICY_ORDER = (
     "standard", "decay_uniform_grid_a1_2", "decay_uniform_a1",
     "fixed_p020", "fixed_uniform", "decay_uniform",
 )
+
+
+def plot_endpoint_improvements(paired: pd.DataFrame, figure_dir: Path) -> None:
+    """Plot paired endpoint improvements using the repository-wide sign convention."""
+    preferred_tasks = (
+        "rbv2_xgboost_31",
+        "rbv2_xgboost_40975",
+        "rbv2_xgboost_1464",
+    )
+    observed_tasks = set(paired["task"])
+    tasks = [task for task in preferred_tasks if task in observed_tasks]
+    tasks.extend(sorted(observed_tasks - set(tasks)))
+    acquisitions = ("logei", "mes_gumbel", "ts", "ucb")
+    policies = (
+        "decay_uniform_grid_a1_2",
+        "decay_uniform_a1",
+        "fixed_p020",
+    )
+    offsets = (-0.20, 0.0, 0.20)
+    fig, axes = plt.subplots(1, len(tasks), figsize=(5.5 * len(tasks), 4.0), squeeze=False)
+    for axis, task in zip(axes[0], tasks):
+        frame = paired[paired["task"] == task]
+        for policy, offset in zip(policies, offsets):
+            selected = frame.set_index(["acquisition", "candidate_policy"])
+            rows = [selected.loc[(acquisition, policy)] for acquisition in acquisitions]
+            means = np.asarray(
+                [row["mean_improvement_standard_minus_candidate"] for row in rows]
+            )
+            lows = np.asarray([row["bootstrap_ci95_low"] for row in rows])
+            highs = np.asarray([row["bootstrap_ci95_high"] for row in rows])
+            x = np.arange(len(acquisitions), dtype=float) + offset
+            significant = (lows > 0) | (highs < 0)
+            axis.errorbar(
+                x,
+                means,
+                yerr=np.vstack((means - lows, highs - means)),
+                fmt="o",
+                color=COLORS[policy],
+                label=LABELS[policy],
+                capsize=2.5,
+                linewidth=1.2,
+                markersize=5,
+            )
+            axis.scatter(
+                x[significant], means[significant], color=COLORS[policy],
+                edgecolor="black", linewidth=0.8, s=38, zorder=4,
+            )
+        axis.axhline(0.0, color="black", linestyle="--", linewidth=1.0)
+        axis.set_xticks(range(len(acquisitions)))
+        axis.set_xticklabels(("LogEI", "MES-G", "GP-TS", "GP-UCB"))
+        axis.tick_params(axis="x", labelsize=9)
+        axis.set_title(TASK_LABELS.get(task, task))
+        axis.grid(axis="y", alpha=0.25)
+    axes[0][0].set_ylabel("Endpoint improvement over Standard\n(Standard loss - PE loss)")
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=3, frameon=False)
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    fig.savefig(figure_dir / "yahpo_endpoint_improvement.png", dpi=180, bbox_inches="tight")
+    fig.savefig(figure_dir / "yahpo_endpoint_improvement.pdf", bbox_inches="tight")
+    plt.close(fig)
 
 
 def main() -> int:
@@ -89,7 +154,9 @@ def main() -> int:
         for policy in sorted(set(frame["policy"]) - {"standard"}):
             candidate = frame[frame["policy"] == policy].set_index("seed")["best_observed_loss"]
             seeds = standard.index.intersection(candidate.index)
-            difference = candidate.loc[seeds].to_numpy() - standard.loc[seeds].to_numpy()
+            # YAHPO reports a loss.  Standard - candidate is therefore a
+            # higher-is-better improvement, consistent with every other public result.
+            difference = standard.loc[seeds].to_numpy() - candidate.loc[seeds].to_numpy()
             if len(difference) > 1:
                 samples = rng.choice(difference, size=(10000, len(difference)), replace=True).mean(axis=1)
                 low, high = np.quantile(samples, [0.025, 0.975])
@@ -101,14 +168,16 @@ def main() -> int:
                 "candidate_policy": policy,
                 "baseline_policy": "standard",
                 "n_seeds": len(difference),
-                "mean_difference_candidate_minus_standard": float(np.mean(difference)),
+                "mean_improvement_standard_minus_candidate": float(np.mean(difference)),
                 "bootstrap_ci95_low": float(low),
                 "bootstrap_ci95_high": float(high),
-                "candidate_wins": int(np.sum(difference < 0)),
-                "candidate_losses": int(np.sum(difference > 0)),
+                "candidate_wins": int(np.sum(difference > 0)),
+                "candidate_losses": int(np.sum(difference < 0)),
                 "ties": int(np.sum(difference == 0)),
             })
-    pd.DataFrame(paired_rows).to_csv(args.input_dir / "paired_comparisons.csv", index=False)
+    paired = pd.DataFrame(paired_rows)
+    paired.to_csv(args.input_dir / "paired_comparisons.csv", index=False)
+    plot_endpoint_improvements(paired, figure_dir)
     return 0
 
 

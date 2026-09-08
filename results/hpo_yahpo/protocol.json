@@ -1,5 +1,5 @@
 {
-  "status": "in_progress",
+  "status": "14d_complete_28d_38d_in_progress",
   "dimensions": [14, 28, 38],
   "acquisitions": ["ucb", "logei", "ts", "mes_gumbel"],
   "policies": ["standard", "decay_alpha_0.5", "decay_alpha_1.0", "fixed_p_0.2"],
@@ -9,5 +9,13 @@
   "signal_variance": 1.0,
   "learn_signal_variance": false,
   "gp_ts": "logarithmic beta and growing fresh Sobol candidates",
-  "partial_results_used_as_evidence": false
+  "completed_dimensions": [14],
+  "in_progress_dimensions": [28, 38],
+  "completed_14d_tasks": [
+    "rbv2_xgboost_31 (credit-g)",
+    "rbv2_xgboost_40975 (car)",
+    "rbv2_xgboost_1464 (blood-transfusion-service-center)"
+  ],
+  "completed_dimensions_used_as_evidence": [14],
+  "incomplete_dimensions_used_as_evidence": false
 }

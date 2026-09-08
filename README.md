@@ -16,8 +16,10 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
   fewer exploratory queries than fixed `p=0.2`; UCB and MES move in the same
   direction, while GP-TS is weak on this task.
 - A small scikit-learn HPO study does not show a reliable overall PE gain.
-  Higher-dimensional YAHPO experiments are still running and are not yet used
-  as evidence.
+- In the completed 14D YAHPO study, decay PE is significantly better in 5 of
+  24 comparisons and significantly worse in 1. The clearest gain is on the
+  `car` task, where alpha 0.5 improves UCB, LogEI, and MES-Gumbel by reducing
+  high-loss failures. The 28D and 38D stages are still running.
 
 Knowledge Gradient is implemented as an optional acquisition for a planned
 follow-up, but no KG result is included in the findings yet.
