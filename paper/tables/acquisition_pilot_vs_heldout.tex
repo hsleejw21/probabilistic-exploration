@@ -1,0 +1,17 @@
+\begin{tabular}{@{}llrlrrlr@{}}
+\toprule
+ & & \multicolumn{3}{c}{Pilot, seeds 0--4} & \multicolumn{3}{c}{Held-out, seeds 5--14} \\
+\cmidrule(lr){3-5}\cmidrule(l){6-8}
+Objective & Acquisition & Improv. & 95\% CI & W/L & Improv. & 95\% CI & W/L \\
+\midrule
+Sparse Hartmann-30 & GP-UCB & \pewin{1.838} & $[0.488, 3.141]$ & 4/1 & \pewin{2.140} & $[1.266, 2.916]$ & 9/1 \\
+ & GP-TS & \pesoft{0.607} & $[-0.035, 1.228]$ & 4/1 & \stdsoft{-0.315} & $[-1.182, 0.610]$ & 4/6 \\
+ & LogEI & \pewin{1.710} & $[0.644, 2.776]$ & 4/1 & \pewin{2.180} & $[1.362, 2.902]$ & 9/1 \\
+ & MES-Gumbel & \pewin{1.722} & $[0.506, 2.937]$ & 4/1 & \pewin{2.307} & $[1.478, 2.900]$ & 9/1 \\
+\addlinespace
+Rosenbrock-30 & GP-UCB & \pesoft{0.1530} & $[-0.0202, 0.2973]$ & 4/1 & \pesoft{0.0145} & $[-0.0398, 0.0712]$ & 6/4 \\
+ & GP-TS & \pesoft{0.0158} & $[-0.0055, 0.0274]$ & 4/1 & \pewin{0.0085} & $[0.0004, 0.0170]$ & 7/3 \\
+ & LogEI & \pewin{0.0681} & $[0.0391, 0.1027]$ & 5/0 & \pewin{0.0747} & $[0.0455, 0.1036]$ & 10/0 \\
+ & MES-Gumbel & \pesoft{0.0013} & $[-0.0140, 0.0191]$ & 3/2 & \pewin{0.0736} & $[0.0436, 0.1059]$ & 9/1 \\
+\bottomrule
+\end{tabular}

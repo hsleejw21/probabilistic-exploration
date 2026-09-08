@@ -1,0 +1,11 @@
+{
+  "status": "in_progress",
+  "dimensions": [14, 28, 38],
+  "acquisitions": ["ucb", "logei"],
+  "policies": ["standard", "decay_alpha_0.5", "decay_alpha_1.0", "fixed_p_0.2"],
+  "pilot_seeds": 5,
+  "confirmation_seeds": 20,
+  "signal_variance": 1.0,
+  "learn_signal_variance": false,
+  "partial_results_used_as_evidence": false
+}

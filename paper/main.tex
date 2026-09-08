@@ -1,0 +1,525 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.82in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.4em}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{5pt}
+\setlength{\belowcaptionskip}{0pt}
+\setlist[itemize]{topsep=2pt,itemsep=1.5pt,parsep=0pt,leftmargin=1.2em}
+\setlist[enumerate]{topsep=2pt,itemsep=1.5pt,parsep=0pt,leftmargin=1.6em}
+
+% Every comparison is written as a higher-is-better performance improvement,
+% PE - Standard, so positive favors PE. Green is PE ahead and red is Standard ahead; the deeper tint plus
+% bold type marks the cells whose 95% interval also excludes zero.
+\newcommand{\pewin}[1]{\cellcolor{green!22}$\mathbf{#1}$}
+\newcommand{\pesoft}[1]{\cellcolor{green!8}$#1$}
+\newcommand{\stdwin}[1]{\cellcolor{red!18}$\mathbf{#1}$}
+\newcommand{\stdsoft}[1]{\cellcolor{red!6}$#1$}
+\newcommand{\setup}{\textbf{Setup.}\ }
+\newcommand{\findings}{\textbf{Findings.}}
+
+\title{Probabilistic Exploration for Efficient Bayesian Optimization}
+\author{Jungwoo Hong}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Research questions, conclusions, and protocol}
+
+This report addresses two research questions. First, does PE help
+beyond a single objective or acquisition function? Second, can the decay
+exponent $\alpha$ be related to dimension or selected reliably from a small
+pilot? Sections~\ref{sec:acq}--\ref{sec:dimalpha} address the first question,
+Section~\ref{sec:choice} addresses the second, and
+Section~\ref{sec:external} tests PE on the Lunar Lander controller objective
+used by TuRBO.
+
+\textbf{Main conclusions.} PE improves GP-UCB, LogEI, and MES-Gumbel on
+multiple 30D objectives. With the theory-aligned GP-TS implementation, the
+benefit repeats on Rosenbrock but not on Bent Cigar or Sparse Hartmann. Useful exponents are usually between
+$1/2$ and $1$, yet neither dimension nor a small seed sweep identifies a
+reliable winner. On Lunar Lander, Decay PE gives a clear and transferable gain
+with LogEI. The current evidence therefore supports PE as a useful option, but
+does not yet support a universal rule for choosing $\alpha$.
+
+\textbf{Protocol.} GP signal variance fixed to $1$ and not learned, so
+$k(x,x)\le 1$; lengthscales learned; GP inputs mapped to $[0,1]^d$; scrambled
+Sobol initial design. Within each benchmark, acquisition, and seed all compared
+policies share the same initial observations and observation-noise stream, so
+every comparison is paired. The decay family is
+$p_t=\log(t+1)/(t+1)^{\alpha}$ with $t$ the one-based BO step after the initial
+design, so a smaller $\alpha$ keeps PE active for more steps.
+For GP-TS, the previous fixed-$\beta$ result is replaced throughout by
+$\beta_t=\log(t+1)$ and a fresh scrambled-Sobol discretization of size
+$\operatorname{clip}(\lceil64\sqrt{t}\rceil,128,512)$ at BO step $t$.
+
+\textbf{Reading the numbers.} Define a higher-is-better performance score as
+$s=-\text{regret}$ on synthetic benchmarks and $s=\text{return}$ on Lunar. All
+comparisons then use one convention:
+\[
+  \text{improvement over Standard} \;=\; s(\text{PE})-s(\text{Standard}).
+\]
+Equivalently, this is Standard regret minus PE regret on synthetic objectives,
+and PE return minus Standard return on Lunar. Thus positive always favors PE.
+Uncertainty is a paired bootstrap 95\% confidence
+interval on that difference. Green favors PE and red favors Standard. A deep,
+bold cell has an interval that excludes zero; a pale cell does not. Figures use
+filled markers or outlined heatmap cells for the same distinction. Intervals
+are not corrected for the simultaneous comparisons in a row, and any cell
+labelled ``best'' was selected and evaluated on the same seeds unless a
+held-out split is stated explicitly.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/scope_status}
+\caption{Stages reported here; all passed completeness and protocol audits.
+Evaluation steps include the initial design. The Lunar held-out row is a
+separate evaluation of saved controllers, not another BO run.}
+\label{tab:scope}
+\end{table}
+
+\section{Does PE help across acquisition functions in 30D?}
+\label{sec:acq}
+
+\setup Three 30D objectives (Sparse Hartmann-6, Rosenbrock, Shifted Bent Cigar)
+$\times$ four acquisitions (GP-UCB, GP-TS, LogEI, MES-Gumbel) $\times$ six
+policies: Standard, Decay Uniform at $\alpha=1/2$, $2/3$, $1$ and $4/3$, and
+Fixed $p=0.2$ as a schedule-free control. LogEI represents the EI family and
+MES-Gumbel the entropy family. We use 500 evaluation steps and ten paired seeds
+throughout. Averaged over the completed runs, $\alpha=1/2$ uses 191 random
+queries, $\alpha=2/3$ uses 83, $\alpha=1$ uses 21, and $\alpha=4/3$ uses 6,
+against 97 for Fixed $p=0.2$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/heldout_alpha_by_acquisition.pdf}
+  \caption{Endpoint improvement over Standard for every objective, acquisition
+  and PE arm.}
+  \label{fig:acqall}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/alpha_half_vs_reference}
+\caption{The slowest exponent in the sweep against $\alpha=2/3$.}
+\label{tab:acqall}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item Three of the four acquisitions have positive mean improvements on all
+        three objectives once the decay is slow enough. LogEI does so at
+        $\alpha=2/3$; GP-UCB and MES-Gumbel need $\alpha=1/2$ on at least one
+        objective. Not every individual interval excludes zero.
+  \item \textbf{For GP-UCB, the conclusion changes with the exponent.} At
+        $\alpha=2/3$ GP-UCB gains only on Sparse Hartmann. At $\alpha=1/2$ it
+        gains on all three: Rosenbrock moves from $0.0145$ with a straddling
+        interval to $0.0513$ $[0.0145, 0.0994]$ at 9/10 seeds, and Bent Cigar
+        from $0.050$ at 4/10 to $0.474$ $[0.202, 0.806]$ at 9/10, a tenfold
+        difference in the same cell.
+  \item The improvement tends to decline as $\alpha$ increases. Among the four decay arms,
+        $\alpha=1/2$ is strongest in seven of the twelve
+        objective--acquisition cells and $\alpha=4/3$ weakest in eight.
+  \item Under the replacement GP-TS, Rosenbrock improves at $\alpha=1/2$
+        ($0.0060$) and $\alpha=2/3$ ($0.0085$), with both paired intervals
+        above zero on the ten held-out seeds. Bent Cigar and Sparse Hartmann
+        have no clear GP-TS gain.
+  \item MES-Gumbel on Bent Cigar is the one block where no arm has a clear
+        gain; every interval contains zero.
+  \item Fixed $p=0.2$ tracks $\alpha=2/3$, whose exploration budget it nearly
+        matches: the two share a sign in eleven of twelve cells and their
+        intervals overlap in all twelve. Because their query counts are close
+        but not exactly matched, this comparison alone cannot separate the
+        effect of timing from the total amount of exploration.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/regret_trajectories.pdf}
+  \caption{Inference regret against evaluation step under LogEI (top) and
+  GP-TS (bottom); lower is better.}
+  \label{fig:trajectories}
+\end{figure}
+
+Under LogEI the gap opens early on Sparse Hartmann and holds for the rest of
+the run; on Bent Cigar it opens near step 130 and widens to the end; on
+Rosenbrock the PE arms are worse than Standard until about step 150. Under
+GP-TS, Rosenbrock ends below Standard for the two slower decay schedules,
+whereas Bent Cigar is mixed and Sparse Hartmann does not show a stable gain.
+
+\subsection{Replication on unseen seeds}
+
+\setup Sparse Hartmann and Rosenbrock were first run on five pilot seeds, then
+on ten seeds disjoint from them. $\alpha=2/3$ is fixed in advance, not selected.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/acquisition_pilot_vs_heldout.pdf}
+  \caption{Decay Uniform $\alpha=2/3$ on the pilot seeds and on the held-out
+  seeds.}
+  \label{fig:acqreplication}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/acquisition_pilot_vs_heldout}
+\caption{Pilot and held-out estimates for Decay Uniform $\alpha=2/3$.}
+\label{tab:acqreplication}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item The non-TS cells largely keep their earlier conclusion, and every one
+        significant on the pilot seeds is significant again: Sparse Hartmann GP-UCB $1.838\to2.140$,
+        LogEI $1.710\to2.180$, MES-Gumbel $1.722\to2.307$, Rosenbrock LogEI
+        $0.0681\to0.0747$.
+  \item Rosenbrock MES-Gumbel becomes significant only on the held-out seeds.
+        With the replacement GP-TS, Sparse Hartmann flips from a positive
+        pilot estimate to a negative held-out estimate, with both intervals
+        containing zero. Rosenbrock keeps the positive direction and becomes
+        significant on the held-out seeds ($0.0085$).
+  \item An earlier pilot with sixty initial evaluations gave a different
+        answer and is not pooled with these results. The conclusions above are
+        for the $n_{\mathrm{initial}}=2$ protocol shown in
+        Table~\ref{tab:scope}.
+\end{itemize}
+
+\section{Does the benefit appear across benchmarks?}
+\label{sec:bench}
+
+\setup Three functions that extend across dimension --- rotated shifted
+mean-scaled Rastrigin, Rosenbrock, and shifted Ackley --- swept over seven
+exponents at $d\in\{2,5,10,20,30\}$ under GP-UCB with Decay Uniform. Ackley uses
+a deterministic interior shift at every dimension so the optimum is never
+central. Each run has 400 BO steps after two initial evaluations, with five
+paired seeds.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/benchmarks_alpha_by_dimension.pdf}
+  \caption{Paired improvement for every dimension and exponent on the three
+  scalable benchmarks.}
+  \label{fig:threebench}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/best_alpha_by_dimension}
+\caption{The exponent with the largest mean improvement at each benchmark and
+dimension.}
+\label{tab:bestalpha}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item All three benchmarks contain significant cells in both directions.
+  \item Rosenbrock moves with dimension: three exponents at 2D and $\alpha=2/3$
+        at 5D favor Standard, then PE gains at 10D $\alpha=2/3$ $(0.0299$
+        $[0.0075, 0.0559])$, at 20D for $\alpha=1/2,2/3,5/6$ $(0.150$ to
+        $0.153)$, and at 30D $\alpha=2/3$ $(0.2218$ $[0.0022, 0.5016])$.
+  \item Ackley gains at 2D $\alpha=1/2$ $(0.0356$ $[0.0086, 0.0591])$ and at 30D
+        for $\alpha=2/3,1,3/2$ $(1.16$ to $1.59)$, but loses at 5D for
+        $\alpha=2/3$ and $\alpha=1$.
+  \item Rastrigin gains at 2D $\alpha=1/2$ $(0.813$ $[0.503, 1.420]$, 5/5 seeds)
+        and 5D $\alpha=1$ $(0.149)$, and loses at 20D $\alpha=1$ $(-4.03)$. Its
+        large 20D and 30D positive means have intervals containing zero.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/benchmark_trajectories.pdf}
+  \caption{Inference regret against evaluation step at $d=5$ and $d=30$;
+  lower is better.}
+  \label{fig:benchtraj}
+\end{figure}
+
+At $d=5$ the PE and Standard curves stay inside each other's bands on Rastrigin and
+Rosenbrock, and on Ackley the $\alpha=1$ arm stalls above Standard for the whole
+run. At $d=30$ the mean PE curves move below Standard inside the first hundred
+steps and keep the gap to the end on all three benchmarks. The endpoint pattern
+is therefore not created only by the final few evaluations, although several
+endpoint intervals still contain zero.
+
+\section{Is the best exponent a function of the dimension?}
+\label{sec:dimalpha}
+
+\findings
+\begin{itemize}
+  \item Reading the best exponent down Table~\ref{tab:bestalpha} gives
+        $1/2, 1, 2/3, 1/2, 5/6$ for Rastrigin, $2/3, 7/6, 2/3, 1/2, 5/6$ for
+        Rosenbrock, and $1/2, 5/6, 1/2, 2/3, 1$ for Ackley. The values cluster
+        in $[1/2, 1]$ and are not ordered by dimension in any benchmark. No
+        dimension has one winner shared by all three benchmarks. Rastrigin
+        and Rosenbrock agree at 10D, 20D, and 30D, while Ackley selects a
+        different exponent in those dimensions.
+  \item On Rosenbrock and Ackley the largest gains appear at higher dimensions,
+        while the best exponent is not monotone in dimension. Every significant
+        high-dimensional cell on those two
+        benchmarks lies in $\alpha\in[1/2,1]$, except Ackley 30D at
+        $\alpha=3/2$.
+  \item The largest mean is not always the significant cell: at 30D Rosenbrock
+        the best mean is $\alpha=5/6$ $(0.2571$ $[-0.0154, 0.5948])$ while the
+        significant cell is $\alpha=2/3$.
+  \item Rows of Figure~\ref{fig:threebench} look flat in $\alpha$ wherever PE
+        helps, but that reading comes from five-seed sweeps. On ten held-out
+        seeds (Section~\ref{sec:acq}) the same range is not flat: $\alpha=1/2$
+        beats $\alpha=2/3$ by a factor of ten on Bent Cigar under GP-UCB.
+  \item Figure~\ref{fig:benchtraj} shows this at the trajectory level: at $d=30$
+        the $\alpha=1/2$ and $\alpha=1$ curves are close to indistinguishable on
+        all three benchmarks, while $\alpha=3/2$ sits between them and Standard
+        and keeps part of the gain $(+1.48$ against $+2.57$ on Rastrigin,
+        $+0.073$ against $+0.235$ on Rosenbrock, $+1.16$ against $+1.59$ on
+        Ackley$)$. The flatness holds inside $[1/2,1]$, not across the whole
+        sweep.
+\end{itemize}
+
+A separate Rastrigin pilot compared seven Uniform and seven
+maximum-posterior-variance (MVR) decay schedules, plus Standard, using
+$n_{\mathrm{initial}}=2d$. Its 375 runs give the same qualitative answer: the
+preferred exponent is no more predictable from dimension under MVR, and the
+two point-selection rules can disagree in direction at the same dimension.
+
+\section{Can the exponent be chosen in practice?}
+\label{sec:choice}
+
+\setup The procedure tested is: sweep $\alpha$ on five seeds, keep the
+per-dimension winner, then evaluate that winner on seeds not used for the
+selection. The winners from the Rastrigin sweep were rerun against Standard on
+fifteen disjoint seeds under identical conditions.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/alpha_selection_heldout.pdf}
+  \caption{Pilot estimate and held-out estimate for the selected exponent at
+  each dimension.}
+  \label{fig:confirmation}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/confirmation_heldout}
+\caption{Pilot versus held-out improvement for the selected exponent.}
+\label{tab:confirmation}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item None of the five selections replicates: every held-out interval contains
+        zero and the effects shrink three- to twelvefold, with 20D falling from
+        $3.40$ to $0.29$ and 30D from $2.84$ to $0.66$.
+  \item At 10D the sign reverses, from $0.69$ to $-0.53$ with 1 win, 5 ties, and
+        9 losses. Win counts still favor PE at 2D, 20D, and 30D.
+\end{itemize}
+
+\subsection{Increasing the selection set from five to twenty seeds}
+
+\setup The sweep was extended to 35 seeds. The per-dimension winner is chosen on
+seeds 0--19 and evaluated on seeds 20--34, which were not used for selection.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/selection_on_fresh_seeds.pdf}
+  \caption{Estimate on the twenty selection seeds and on the fifteen untouched
+  seeds, for the exponent chosen at each dimension.}
+  \label{fig:freshselection}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/selection_fresh}
+\caption{The selected exponent and a pre-fixed $\alpha=1/2$, both scored on
+seeds 20--34.}
+\label{tab:selectionfresh}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item Only $d=2$ replicates, at $0.869$ $[0.386, 1.382]$. At $d=20$ the
+        selected $\alpha=5/6$ moves from $+1.559$ on the selection seeds to
+        $-2.445$ $[-4.495, -0.473]$ on the untouched ones, a reversal that is
+        itself significant.
+  \item Not selecting does better. Fixing $\alpha=1/2$ scores $-0.025$ averaged
+        over the five dimensions against $-0.295$ for the selection rule, though
+        it is significantly worse than Standard at $d=5$.
+  \item Averaged over 200 random train/test splits inside seeds 0--19, fixing
+        $\alpha=1/2$ returns $+0.592 \pm 0.179$ and is positive in 100\% of
+        splits, while the best selection rule tested --- pick the exponent with
+        the highest win rate --- returns $+0.466 \pm 0.228$ in 96\%. Picking by
+        mean, median, lower confidence bound or a smoothed argmax all do worse.
+        A post-hoc oracle would return $+1.040$. Thus the grid contains better
+        choices, but the tested selection rules do not identify them reliably.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/seed_blocks}
+\caption{The same cell, $\alpha=1/2$, estimated on two disjoint seed blocks.}
+\label{tab:seedblocks}
+\end{table}
+
+Table~\ref{tab:seedblocks} explains why. At $d=30$ the same policy measures
+$+2.401$ on seeds 0--19 and $-0.307$ on seeds 20--34. Rastrigin at 400 BO steps
+carries enough seed variance that a twenty-seed block estimate moves by more than
+the effect being measured, so any per-dimension number from this sweep should be
+read as specific to its seed block.
+
+The simple run-conditioned rule tested here is also insufficient. A 40-step
+Standard prefix has no consistent association with the later PE outcome: the
+Spearman correlation
+between the prefix improvement rate and the eventual gain at $\alpha=1/2$ is
+$-0.23, 0.11, 0.07, 0.33, -0.08$ across the five dimensions, and the correlation
+with the seed's own best exponent never exceeds $0.26$ in magnitude. The per-seed
+best exponent is not concentrated either: at $d=5$ the modal exponent wins on 4
+of 20 seeds and at $d=30$ on 5 of 20, so there is no stable target to predict.
+
+\section{Lunar Lander controller tuning}
+\label{sec:external}
+
+\setup This is the 12-parameter Lunar Lander controller problem used by TuRBO.
+One evaluation flies the controller on 50 fixed terrains and uses their average
+return. We ran 30 seeds. Policies in the same seed share the terrains and the 24
+initial Sobol points, so the comparison is paired. Each run has 400 evaluations.
+
+The GP uses a Mat\'ern kernel, fixes signal variance to $1$, and learns only the
+lengthscales. The completed results use GP-UCB, GP-TS, LogEI, and MES-Gumbel
+with five policies:
+Standard, decay $\alpha=1/2,2/3,1$, and Fixed $p=0.2$.
+The GP-TS row is the completed 150-trial replacement using
+$\beta_t=\log(t+1)$ and the increasing Sobol discretization described above;
+the previous fixed-$\beta$ result is not used.
+
+A controller is counted as solved when its average return is at least 200. We
+report return directly because 200 is a success threshold, not the true optimum.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/lunar_returns.pdf}
+  \caption{How much each PE policy changes the final return. Positive values
+  favor PE. Right-hand numbers are solved runs out of 30.}
+  \label{fig:lunarreturns}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/lunar_logei}
+\caption{LogEI results. Each improvement is compared with Standard using the
+same 30 seeds. PE queries exclude the 24 initial evaluations.}
+\label{tab:lunarlogei}
+\end{table}
+
+\findings
+\begin{itemize}
+  \item LogEI is the clearest case. Standard scores $215.8$. Decay
+        $\alpha=1/2$ scores $261.8$ $(+46.0)$, and $\alpha=1$ scores $261.5$
+        $(+45.6)$. Both confidence intervals exclude zero.
+  \item With LogEI, solved runs increase from 21/30 to 27/30 at
+        $\alpha=1/2$. A crash gives roughly $-100$, so a 50-terrain average over
+        200 means the controller lands reliably.
+  \item At $\alpha=1/2$, GP-UCB improves by $+29.0$ and MES-Gumbel by $+23.5$.
+        Their confidence intervals still include zero.
+  \item Under the replacement GP-TS, $\alpha=1/2$ changes mean return by
+        $+9.1$ with a 95\% interval of $[-32.8,+50.1]$. The solved count is
+        4/30 for Standard and 3/30 for PE, so this setting gives no clear
+        evidence of a GP-TS gain on Lunar.
+\end{itemize}
+
+\subsection{When PE is used matters}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/lunar_schedule}
+\caption{Decay schedules compared directly with Fixed $p=0.2$ under LogEI.}
+\label{tab:lunarschedule}
+\end{table}
+
+Decay $\alpha=1$ beats Fixed $p=0.2$ by $+29.4$ $[+9.1,+52.2]$. It uses only
+17.4 random queries on average, while Fixed uses 73.3. Therefore, the gain is not
+simply from using more random queries. Using PE early and then returning to
+LogEI appears better than spreading random queries across the whole run. A
+matched-count experiment is still needed to confirm this point.
+
+\subsection{The improvement transfers to unseen terrains}
+
+The results above score each controller on the 50 episode seeds used during its
+own BO run. To check whether those results are specific to that set, we took all
+150 final LogEI controllers (30 BO seeds and five policies) and evaluated every
+one on the same 200 new episode seeds. None of these seeds appears among the
+1{,}500 seeds used during optimisation. This is a separate test of the final
+controllers; BO was not run again. In total, the check contains 30{,}000 new
+rollouts.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/lunar_heldout_generalization.pdf}
+  \caption{The LogEI improvement on each run's original 50 episodes and on a
+  shared set of 200 unseen episodes. The two estimates are nearly unchanged.}
+  \label{fig:lunarheldout}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/lunar_heldout}
+\caption{Performance on 200 unseen episodes. ``Episodes $\geq 200$'' is the
+fraction of individual episodes whose return reaches 200. ``Bottom 10\%'' is
+the mean of each controller's 20 lowest returns. A controller is solved when
+its mean over all 200 episodes reaches 200.}
+\label{tab:lunarheldout}
+\end{table}
+
+All three decay schedules remain better than Standard: their paired
+mean-return confidence intervals stay above zero. The largest average result is
+$\alpha=1/2$: mean return rises from $209.9$ to $259.5$, the fraction of
+episodes reaching 200 rises from $73.1\%$ to $91.4\%$, and solved controllers
+rise from 20/30 to 27/30. Its bottom-10\% return also rises from $48.8$ to
+$124.7$, so the gain is not limited to easy terrains. The original and held-out
+improvements are $+46.0$ and $+49.6$, respectively. Fixed $p=0.2$ remains
+uncertain, while decay $\alpha=1/2$ beats it by $+32.2$ $[+6.9,+59.9]$ on the
+new episodes. This is strong evidence against the explanation that PE only
+found controllers specialised to the 50 episodes used during optimisation.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.667\textwidth]{figures/lunar_logei_trajectory.pdf}
+  \caption{Mean return of the currently recommended controller as LogEI
+  accumulates evaluations. The dotted line is the solved threshold of 200.}
+  \label{fig:lunartrajectory}
+\end{figure}
+
+\section{Hyperparameter optimisation}
+\label{sec:hpo}
+
+As a first transfer test outside analytic functions and simulation control, we
+ran six scikit-learn model-tuning tasks with GP-UCB and LogEI. The confirmation
+uses 20 paired seeds per cell, 100 evaluations, and the same fixed unit signal
+variance. Across 36 acquisition--task--PE comparisons, no PE policy gives a
+significant held-out test-loss improvement over Standard. The result is useful
+as a negative transfer check: the current evidence does not support claiming
+that PE helps every HPO problem.
+
+A higher-dimensional YAHPO study is in progress on 14D, 28D, and 38D surrogate
+benchmarks. It uses GP-UCB and LogEI with Standard, decay $\alpha=1/2$, decay
+$\alpha=1$, and Fixed $p=0.2$. Because that study is incomplete, this report
+records its protocol but draws no conclusion from partial runs.
+
+\end{document}

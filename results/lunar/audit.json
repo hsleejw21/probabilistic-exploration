@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "controllers": 150,
+  "policies": 5,
+  "training_seeds_per_policy": 30,
+  "heldout_episodes_per_controller": 200,
+  "total_rollouts": 30000,
+  "unique_controller_episode_keys": 30000,
+  "all_source_signal_variances_equal_one": true,
+  "all_source_iterations_equal_400": true
+}

@@ -1,0 +1,25 @@
+policy,policy_label,reference,reference_label,metric,paired_mean_difference,bootstrap_ci95_lower,bootstrap_ci95_upper,wins,ties,losses
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,mean_return,49.58098753596889,23.7473528814672,76.91985089317308,18,0,12
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,episode_success_rate,0.18316666666666667,0.09000000000000001,0.287,21,0,9
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,bottom_10pct_mean_return,75.87344133820969,22.578333523180326,131.69914651169037,20,0,10
+decay_uniform_grid_a2_3,Decay alpha=2/3,standard,Standard,mean_return,39.8376215390062,10.561003251653167,71.0472925406785,21,0,9
+decay_uniform_grid_a2_3,Decay alpha=2/3,standard,Standard,episode_success_rate,0.14383333333333334,0.039333333333333345,0.25800000000000006,22,1,7
+decay_uniform_grid_a2_3,Decay alpha=2/3,standard,Standard,bottom_10pct_mean_return,65.40106768697532,5.674241873620069,126.0198052750167,20,0,10
+decay_uniform_grid_a1,Decay alpha=1,standard,Standard,mean_return,45.80520110002964,22.825085674117886,72.23476164910639,25,0,5
+decay_uniform_grid_a1,Decay alpha=1,standard,Standard,episode_success_rate,0.15899999999999997,0.06966666666666668,0.2615,21,1,8
+decay_uniform_grid_a1,Decay alpha=1,standard,Standard,bottom_10pct_mean_return,64.69859549912871,18.487731228181783,114.87111217151711,19,0,11
+fixed_p020,Fixed p=0.2,standard,Standard,mean_return,17.362560487136246,-14.25114833963585,48.4492763041355,18,0,12
+fixed_p020,Fixed p=0.2,standard,Standard,episode_success_rate,0.05683333333333333,-0.06349999999999997,0.17800416666666694,18,3,9
+fixed_p020,Fixed p=0.2,standard,Standard,bottom_10pct_mean_return,8.558363793608462,-59.901476437922,76.76795074137607,18,0,12
+standard,Standard,fixed_p020,Fixed p=0.2,mean_return,-17.362560487136246,-48.57816250412684,13.778029958807233,12,0,18
+standard,Standard,fixed_p020,Fixed p=0.2,episode_success_rate,-0.05683333333333333,-0.176,0.06416666666666666,9,3,18
+standard,Standard,fixed_p020,Fixed p=0.2,bottom_10pct_mean_return,-8.558363793608462,-76.74418570626467,59.29836632468511,12,0,18
+decay_uniform_grid_a1_2,Decay alpha=1/2,fixed_p020,Fixed p=0.2,mean_return,32.21842704883266,6.851064183705637,59.87760426702644,18,0,12
+decay_uniform_grid_a1_2,Decay alpha=1/2,fixed_p020,Fixed p=0.2,episode_success_rate,0.12633333333333333,0.03766666666666667,0.2265,17,2,11
+decay_uniform_grid_a1_2,Decay alpha=1/2,fixed_p020,Fixed p=0.2,bottom_10pct_mean_return,67.31507754460122,4.395388173643099,132.27370867192002,17,0,13
+decay_uniform_grid_a2_3,Decay alpha=2/3,fixed_p020,Fixed p=0.2,mean_return,22.475061051869936,-10.226145449225067,54.42753400232637,17,0,13
+decay_uniform_grid_a2_3,Decay alpha=2/3,fixed_p020,Fixed p=0.2,episode_success_rate,0.08700000000000001,-0.026666666666666648,0.2026708333333336,18,1,11
+decay_uniform_grid_a2_3,Decay alpha=2/3,fixed_p020,Fixed p=0.2,bottom_10pct_mean_return,56.84270389336686,-13.937953914868892,126.55725556742676,17,0,13
+decay_uniform_grid_a1,Decay alpha=1,fixed_p020,Fixed p=0.2,mean_return,28.442640612893392,4.703506331878902,54.63307570601554,19,0,11
+decay_uniform_grid_a1,Decay alpha=1,fixed_p020,Fixed p=0.2,episode_success_rate,0.10216666666666668,0.015666666666666666,0.19883333333333336,18,1,11
+decay_uniform_grid_a1,Decay alpha=1,fixed_p020,Fixed p=0.2,bottom_10pct_mean_return,56.14023170552024,-4.622246063315636,121.30226790885497,16,0,14

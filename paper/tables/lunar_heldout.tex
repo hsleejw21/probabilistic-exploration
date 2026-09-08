@@ -1,0 +1,11 @@
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Policy & Mean return & Gain vs. Standard (95\% CI) & Episodes $\geq 200$ & Bottom 10\% & Solved \\
+\midrule
+Standard & 209.9 & -- & 73.1\% & 48.8 & 20/30 \\
+$\alpha=1/2$ & \textbf{259.5} & \pewin{49.6} $[23.7, 76.9]$ & \textbf{91.4\%} & \textbf{124.7} & \textbf{27/30} \\
+$\alpha=2/3$ & 249.8 & \pewin{39.8} $[10.6, 71.0]$ & 87.5\% & 114.2 & 25/30 \\
+$\alpha=1$ & 255.7 & \pewin{45.8} $[22.8, 72.2]$ & 89.0\% & 113.5 & 25/30 \\
+Fixed $p=0.2$ & 227.3 & \pesoft{17.4} $[-14.3, 48.4]$ & 78.8\% & 57.4 & 22/30 \\
+\bottomrule
+\end{tabular}

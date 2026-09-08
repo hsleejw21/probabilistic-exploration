@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "tasks": 6,
+  "acquisitions": ["ucb", "logei"],
+  "policies": ["standard", "decay_alpha_0.5", "decay_alpha_1.0", "fixed_p_0.2"],
+  "budget": 100,
+  "pilot_seeds": 5,
+  "confirmation_seeds": 20,
+  "signal_variance": 1.0,
+  "learn_signal_variance": false,
+  "paired_initial_design": true
+}
