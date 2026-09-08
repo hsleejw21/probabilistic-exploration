@@ -1,11 +1,13 @@
 {
   "status": "in_progress",
   "dimensions": [14, 28, 38],
-  "acquisitions": ["ucb", "logei"],
+  "acquisitions": ["ucb", "logei", "ts", "mes_gumbel"],
   "policies": ["standard", "decay_alpha_0.5", "decay_alpha_1.0", "fixed_p_0.2"],
-  "pilot_seeds": 5,
-  "confirmation_seeds": 20,
+  "n_initial": 10,
+  "budgets_by_dimension": {"14": 120, "28": 200, "38": 250},
+  "confirmation_seeds": 30,
   "signal_variance": 1.0,
   "learn_signal_variance": false,
+  "gp_ts": "logarithmic beta and growing fresh Sobol candidates",
   "partial_results_used_as_evidence": false
 }

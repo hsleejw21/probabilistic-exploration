@@ -518,8 +518,10 @@ as a negative transfer check: the current evidence does not support claiming
 that PE helps every HPO problem.
 
 A higher-dimensional YAHPO study is in progress on 14D, 28D, and 38D surrogate
-benchmarks. It uses GP-UCB and LogEI with Standard, decay $\alpha=1/2$, decay
-$\alpha=1$, and Fixed $p=0.2$. Because that study is incomplete, this report
+benchmarks. It uses GP-UCB, LogEI, theory-aligned GP-TS, and MES-Gumbel with
+Standard, decay $\alpha=1/2$, decay $\alpha=1$, and Fixed $p=0.2$. Every
+dimension uses ten initial points, thirty confirmation seeds, and respectively
+120, 200, and 250 evaluations. Because that study is incomplete, this report
 records its protocol but draws no conclusion from partial runs.
 
 \end{document}

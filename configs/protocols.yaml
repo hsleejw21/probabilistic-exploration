@@ -30,6 +30,7 @@ sklearn_hpo:
 yahpo_highdim_hpo:
   status: in_progress
   dimensions: [14, 28, 38]
-  acquisitions: [ucb, logei]
-  pilot_seeds: 5
-  confirmation_seeds: 20
+  acquisitions: [ucb, logei, ts, mes_gumbel]
+  n_initial: 10
+  budgets: {14: 120, 28: 200, 38: 250}
+  confirmation_seeds: 30

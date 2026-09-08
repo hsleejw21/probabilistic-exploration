@@ -38,7 +38,7 @@ from probabilistic_exploration.gp_surrogate import build_gaussian_process
 from probabilistic_exploration.yahpo_benchmarks import YAHPO_TASKS, empirical_target_range, objective_loss
 
 
-ACQUISITIONS = ("ucb", "ts", "logei")
+ACQUISITIONS = ("ucb", "ts", "logei", "mes_gumbel")
 FIELDS = [
     "task", "scenario", "instance", "target", "dimension", "acquisition",
     "beta_mode", "policy", "seed", "iteration", "bo_iteration", "event",
@@ -72,7 +72,10 @@ def application_config(dimension: int, budget: int):
     return replace(
         high_dimensional_config(),
         budget_override=budget,
-        n_initial=2 * dimension,
+        # Keep the initial random-design budget independent of dimension.
+        # A 2d design gives higher-dimensional Standard policies substantially
+        # more free exploration before PE is allowed to act.
+        n_initial=10,
         noise_variance=0.0,
         gp_nugget_variance=1e-4,
         initial_signal_variance=1.0,
@@ -95,7 +98,9 @@ def run_trial(spec: TrialSpec, budget: int) -> list[dict[str, object]]:
     task = YAHPO_TASKS[spec.task]
     config = application_config(task.dim, budget)
     if config.n_initial >= budget:
-        raise ValueError(f"budget {budget} must exceed 2d={config.n_initial}")
+        raise ValueError(
+            f"budget {budget} must exceed n_initial={config.n_initial}"
+        )
 
     streams = np.random.SeedSequence(spec.seed).spawn(5)
     initial_design = sobol_points(
@@ -438,7 +443,7 @@ def main() -> int:
         "num_seeds": args.num_seeds,
         "seed_start": args.seed_start,
         "budget": args.budget,
-        "initial_design": "2d scrambled Sobol, included in budget",
+        "initial_design": "10 scrambled Sobol points, included in budget",
         "objective": "minimize YAHPO-predicted validation log loss",
         "gp_observation_noise": 0.0,
         "gp_nugget_variance": 1e-4,
