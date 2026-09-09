@@ -22,7 +22,7 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
   high-loss failures.
 - In the completed 28D YAHPO study, alpha 0.5 significantly improves LogEI and
   GP-TS on `sylvine`, with no significant decay-policy loss. Most other cells
-  are tied or inconclusive. The 38D stage remains in progress.
+  are tied or inconclusive.
 
 Knowledge Gradient is implemented as an optional acquisition for a planned
 follow-up, but no KG result is included in the findings yet.

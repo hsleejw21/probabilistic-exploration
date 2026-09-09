@@ -79,7 +79,7 @@ def test_completed_yahpo_28d_release_is_audited():
     result_dir = Path(__file__).resolve().parents[1] / "results" / "hpo_yahpo"
     protocol = json.loads((result_dir / "protocol.json").read_text())
     assert protocol["completed_dimensions"] == [14, 28]
-    assert protocol["in_progress_dimensions"] == [38]
+    assert protocol["in_progress_dimensions"] == []
 
     with (result_dir / "paired_improvements_28d.csv").open(newline="") as handle:
         comparisons = list(csv.DictReader(handle))

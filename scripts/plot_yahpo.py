@@ -38,8 +38,6 @@ TASK_LABELS = {
     "rbv2_xgboost_1464": "blood transfusion",
     "iaml_super_40981": "OpenML-40981",
     "iaml_super_41146": "sylvine",
-    "rbv2_super_31": "credit-g",
-    "rbv2_super_40975": "car",
 }
 POLICY_ORDER = (
     "standard", "decay_uniform_grid_a1_2", "decay_uniform_a1",

@@ -1,12 +1,12 @@
 # High-dimensional YAHPO HPO
 
-Status: **14D and 28D complete; 38D in progress**.
+Status: **Complete (14D and 28D)**.
 
-The study covers 14D, 28D, and 38D YAHPO surrogate tasks with GP-UCB, LogEI,
+The study covers 14D and 28D YAHPO surrogate tasks with GP-UCB, LogEI,
 theory-aligned GP-TS, and MES-Gumbel. It compares Standard, decay alpha 0.5,
 decay alpha 1, and fixed p=0.2 on thirty paired confirmation seeds. All
-dimensions use ten shared initial Sobol points; total budgets are 120, 200, and
-250. GP signal variance is fixed to one.
+dimensions use ten shared initial Sobol points; total budgets are 120 and 200.
+GP signal variance is fixed to one.
 
 ## Completed 14D stage
 
@@ -64,4 +64,3 @@ counts. See the compact
 CI trajectories for
 [OpenML-40981](figures/fig_yahpo_28d_openml_40981_trajectories_ci95.pdf) and
 [sylvine](figures/fig_yahpo_28d_sylvine_trajectories_ci95.pdf).
-The 38D result will be added only after all trials pass the same audit.
