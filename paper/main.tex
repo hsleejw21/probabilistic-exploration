@@ -42,8 +42,8 @@ beyond a single objective or acquisition function? Second, can the decay
 exponent $\alpha$ be related to dimension or selected reliably from a small
 pilot? Sections~\ref{sec:acq}--\ref{sec:dimalpha} address the first question,
 Section~\ref{sec:choice} addresses the second, and
-Section~\ref{sec:external} tests PE on the Lunar Lander controller objective
-used by TuRBO.
+Sections~\ref{sec:external} and \ref{sec:hpo} test transfer to Lunar Lander
+controller tuning and hyperparameter optimisation.
 
 \textbf{Main conclusions.} PE improves GP-UCB, LogEI, and MES-Gumbel on
 multiple 30D objectives. With the theory-aligned GP-TS implementation, the
@@ -51,8 +51,9 @@ benefit repeats on Rosenbrock but not on Bent Cigar or Sparse Hartmann. Useful e
 $1/2$ and $1$, yet neither dimension nor a small seed sweep identifies a
 reliable winner. On Lunar Lander, Decay PE gives a clear and transferable gain
 with LogEI. In 14D YAHPO tuning, Decay PE helps several UCB, LogEI, and MES
-settings, mainly by reducing high-loss failures on one dataset, but does not
-help GP-TS consistently. The current evidence therefore supports PE as a
+settings, mainly by reducing high-loss failures on one dataset. In 28D, decay
+$\alpha=1/2$ improves LogEI and GP-TS on \texttt{sylvine}, but most other cells
+remain tied or inconclusive. The current evidence therefore supports PE as a
 useful option, but does not yet support a universal rule for choosing $\alpha$.
 
 \textbf{Protocol.} GP signal variance fixed to $1$ and not learned, so
@@ -523,8 +524,9 @@ The higher-dimensional YAHPO study uses GP-UCB, LogEI, theory-aligned GP-TS,
 and MES-Gumbel with Standard, decay $\alpha=1/2$, decay $\alpha=1$, and Fixed
 $p=0.2$. Every dimension uses ten initial points and thirty paired confirmation
 seeds. The completed 14D stage covers three XGBoost tasks and 120 evaluations,
-for 1,440 audited trials. The 28D and 38D stages use 200 and 250 evaluations and
-remain in progress; no partial result from either stage is interpreted here.
+for 1,440 audited trials. The completed 28D stage covers two \texttt{iaml\_super}
+tasks and 200 evaluations, for 960 audited trials. The 38D stage uses 250
+evaluations and remains in progress; no partial 38D result is interpreted here.
 
 Because YAHPO reports validation log loss, its improvement is Standard loss
 minus PE loss. Figure~\ref{fig:yahpo14} shows the paired mean and bootstrap
@@ -561,5 +563,35 @@ reliable gain and is worse with $\alpha=1/2$ on \texttt{blood transfusion} by
 $0.0084$ $[0.0052,0.0117]$. Finally, Fixed $p=0.2$ also improves UCB, LogEI,
 and MES-Gumbel on \texttt{car}; this stage supports problem-dependent explicit
 exploration, but does not establish that decay always beats a fixed rate.
+
+Figure~\ref{fig:yahpo28} and Table~\ref{tab:yahpo28} summarize the completed
+28D stage under the same convention.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_yahpo_28d_endpoint_improvement.pdf}
+  \caption{Endpoint improvement over Standard on the completed 28D YAHPO
+  tasks. Filled markers have paired 95\% intervals excluding zero; hollow
+  markers have intervals containing zero.}
+  \label{fig:yahpo28}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/tab_yahpo_28d_endpoint_improvement}
+\caption{Mean endpoint improvement over Standard in 28D YAHPO. Positive values
+favor PE. Deep, bold cells have paired 95\% intervals excluding zero.}
+\label{tab:yahpo28}
+\end{table}
+
+Across the 16 decay-policy comparisons, 2 improve significantly, none is
+significantly worse, and 14 are inconclusive. Both clear gains occur on
+\texttt{sylvine} with $\alpha=1/2$: LogEI improves by $0.0056$
+$[0.0012,0.0099]$ and GP-TS by $0.0103$ $[0.0029,0.0174]$. GP-TS wins 21 of
+30 paired seeds. No comparison is conclusive on \texttt{OpenML-40981}, where
+many policies reach the same endpoint, and all Fixed $p=0.2$ comparisons are
+inconclusive. The 28D evidence therefore extends the positive HPO result to
+GP-TS, but again shows that the benefit is task- and acquisition-dependent.
 
 \end{document}

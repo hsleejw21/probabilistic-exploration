@@ -1,4 +1,7 @@
+import csv
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 
@@ -70,3 +73,21 @@ def test_public_figures_use_stable_semantic_colours_and_labels():
     assert ACQUISITION_LABELS["ucb"] == "GP-UCB"
     assert ACQUISITION_LABELS["mes_gumbel"] == "MES-Gumbel"
     assert ACQUISITION_ORDER[:4] == ("ucb", "ts", "logei", "mes_gumbel")
+
+
+def test_completed_yahpo_28d_release_is_audited():
+    result_dir = Path(__file__).resolve().parents[1] / "results" / "hpo_yahpo"
+    protocol = json.loads((result_dir / "protocol.json").read_text())
+    assert protocol["completed_dimensions"] == [14, 28]
+    assert protocol["in_progress_dimensions"] == [38]
+
+    with (result_dir / "paired_improvements_28d.csv").open(newline="") as handle:
+        comparisons = list(csv.DictReader(handle))
+    assert len(comparisons) == 24
+    assert sum(float(row["bootstrap_ci95_low"]) > 0 for row in comparisons) == 2
+    assert sum(float(row["bootstrap_ci95_high"]) < 0 for row in comparisons) == 0
+
+    audit = (result_dir / "audit_28d.txt").read_text()
+    assert audit.startswith("PASS ")
+    assert "trials=960" in audit
+    assert "budget=200" in audit

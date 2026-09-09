@@ -19,7 +19,10 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
 - In the completed 14D YAHPO study, decay PE is significantly better in 5 of
   24 comparisons and significantly worse in 1. The clearest gain is on the
   `car` task, where alpha 0.5 improves UCB, LogEI, and MES-Gumbel by reducing
-  high-loss failures. The 28D and 38D stages are still running.
+  high-loss failures.
+- In the completed 28D YAHPO study, alpha 0.5 significantly improves LogEI and
+  GP-TS on `sylvine`, with no significant decay-policy loss. Most other cells
+  are tied or inconclusive. The 38D stage remains in progress.
 
 Knowledge Gradient is implemented as an optional acquisition for a planned
 follow-up, but no KG result is included in the findings yet.

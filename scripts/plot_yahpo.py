@@ -36,6 +36,10 @@ TASK_LABELS = {
     "rbv2_xgboost_31": "credit-g",
     "rbv2_xgboost_40975": "car",
     "rbv2_xgboost_1464": "blood transfusion",
+    "iaml_super_40981": "OpenML-40981",
+    "iaml_super_41146": "sylvine",
+    "rbv2_super_31": "credit-g",
+    "rbv2_super_40975": "car",
 }
 POLICY_ORDER = (
     "standard", "decay_uniform_grid_a1_2", "decay_uniform_a1",
@@ -209,7 +213,7 @@ def main() -> int:
         dimension = int(task_frame["dimension"].iloc[0])
         fig.legend(handles, labels, loc="upper center", ncol=len(labels))
         fig.suptitle(
-            f"{TASK_LABELS.get(task, task)} {dimension}D: YAHPO XGBoost tuning",
+            f"{TASK_LABELS.get(task, task)} {dimension}D: YAHPO tuning",
             y=0.88,
         )
         fig.text(
@@ -221,7 +225,9 @@ def main() -> int:
             fontsize=8.5,
         )
         fig.tight_layout(rect=(0, 0.08, 1, 0.80))
-        task_slug = TASK_LABELS.get(task, task).replace(" ", "_").replace("-", "_")
+        task_slug = (
+            TASK_LABELS.get(task, task).lower().replace(" ", "_").replace("-", "_")
+        )
         save_figure(
             fig,
             figure_dir,

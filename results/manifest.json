@@ -8,7 +8,7 @@
     {"id": "synthetic_practical_alpha", "status": "exploratory"},
     {"id": "lunar_12d", "status": "complete"},
     {"id": "sklearn_hpo", "status": "complete"},
-    {"id": "yahpo_highdim_hpo", "status": "14d_complete_28d_38d_in_progress"}
+    {"id": "yahpo_highdim_hpo", "status": "14d_28d_complete_38d_in_progress"}
   ],
   "excluded": [
     "quota and qplus methods",

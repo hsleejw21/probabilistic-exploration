@@ -1,6 +1,6 @@
 # High-dimensional YAHPO HPO
 
-Status: **14D complete; 28D and 38D in progress**.
+Status: **14D and 28D complete; 38D in progress**.
 
 The study covers 14D, 28D, and 38D YAHPO surrogate tasks with GP-UCB, LogEI,
 theory-aligned GP-TS, and MES-Gumbel. It compares Standard, decay alpha 0.5,
@@ -41,5 +41,27 @@ completed trial. See the compact
 CI trajectories for [credit-g](figures/fig_yahpo_14d_credit_g_trajectories_ci95.pdf),
 [car](figures/fig_yahpo_14d_car_trajectories_ci95.pdf), and
 [blood transfusion](figures/fig_yahpo_14d_blood_transfusion_trajectories_ci95.pdf).
-Results from 28D and 38D will be added only after their full trial counts pass
-the same audit.
+
+## Completed 28D stage
+
+The 28D stage contains two `iaml_super` tuning tasks (`OpenML-40981` and
+`sylvine`), 200 evaluations, and 960 audited trials. Of the 16 decay-policy
+comparisons, 2 are significantly better than Standard, none is significantly
+worse, and 14 are inconclusive.
+
+- On `sylvine`, decay alpha 0.5 improves LogEI by 0.0056
+  [0.0012, 0.0099] and GP-TS by 0.0103 [0.0029, 0.0174]. GP-TS wins 21 of
+  30 paired seeds; LogEI wins 13, loses 4, and ties 13.
+- No comparison is conclusive on `OpenML-40981`. UCB and MES-Gumbel usually
+  reach the same endpoint across policies, and many LogEI seeds also tie.
+- Every fixed p=0.2 comparison is inconclusive. The 28D result therefore adds
+  evidence that decay PE can transfer to HPO, but the effect remains dependent
+  on the task and acquisition.
+
+`paired_improvements_28d.csv` contains the complete intervals and paired
+counts. See the compact
+[endpoint figure](figures/fig_yahpo_28d_endpoint_improvement.pdf) and the 95%
+CI trajectories for
+[OpenML-40981](figures/fig_yahpo_28d_openml_40981_trajectories_ci95.pdf) and
+[sylvine](figures/fig_yahpo_28d_sylvine_trajectories_ci95.pdf).
+The 38D result will be added only after all trials pass the same audit.
