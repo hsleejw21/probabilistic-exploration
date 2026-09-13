@@ -1,1 +1,1 @@
-PASS /nfsdata/home/jungwoo.hong/study/bayesian_optimization/experiments/probabilistic_exploration/results/followup_2026_09_14/greedy_packing_pe/rastrigin_dimension_extension_seeds5_19/d30: trials=45, budget=402, history_rows=18090
+PASS (source path omitted): trials=45, budget=402, history_rows=18090

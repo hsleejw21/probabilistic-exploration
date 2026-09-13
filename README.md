@@ -25,9 +25,11 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
   are tied or inconclusive.
 - Finite-grid Greedy Packing is strongly problem-dependent. It is effective on
   Rastrigin 10D and 30D and preserves PE gains for several 30D Sparse Hartmann
-  acquisitions. Fresh Rastrigin seeds retain an advantage, but transferring
-  the same schedule to Ackley and Rosenbrock usually does not. Uniform PE is
-  therefore still the more reliable default.
+  acquisitions. It also gives selective gains on 28D YAHPO, while both Uniform
+  and Greedy PE improve over Standard on Lunar Lander. However, transferring
+  the Rastrigin schedule to Ackley and Rosenbrock usually fails, and enlarging
+  the finite grid does not remove this dependence. Uniform PE is therefore
+  still the more reliable default.
 
 Knowledge Gradient is implemented as an optional acquisition for a planned
 follow-up, but no KG result is included in the findings yet.

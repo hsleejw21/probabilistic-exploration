@@ -15,6 +15,7 @@ if str(SOURCE_DIR) not in sys.path:
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.gridspec import GridSpec
 from matplotlib.lines import Line2D
 
 from probabilistic_exploration.plot_style import (
@@ -164,7 +165,16 @@ def draw_forest(
     style_axis(axis, grid_axis="x")
 
 
-def plot_30d(frame: pd.DataFrame, output_dir: Path) -> None:
+def plot_30d(
+    frame: pd.DataFrame,
+    output_dir: Path,
+    *,
+    stem: str = "fig_greedy_packing_acquisition_30d",
+    note: str = (
+        "Ten paired seeds. Positive values favour the first method named; "
+        "panels use independent scales."
+    ),
+) -> None:
     fig, axes = plt.subplots(
         1, 3, figsize=(WIDTH_FULL, 4.45), sharey=True, constrained_layout=False
     )
@@ -180,11 +190,197 @@ def plot_30d(frame: pd.DataFrame, output_dir: Path) -> None:
     shared_legend(fig)
     fig.text(
         0.5, 0.025,
-        "Ten paired seeds. Positive values favour the first method named; panels use independent scales.",
+        note,
         ha="center", color=TEXT_SECONDARY,
     )
     fig.subplots_adjust(left=0.09, right=0.99, top=0.78, bottom=0.22, wspace=0.30)
-    save_figure(fig, output_dir, "fig_greedy_packing_acquisition_30d")
+    save_figure(fig, output_dir, stem)
+    plt.close(fig)
+
+
+YAHPO_TASK_LABELS = {
+    "rbv2_xgboost_31": "credit-g (14D)",
+    "rbv2_xgboost_40975": "car (14D)",
+    "rbv2_xgboost_1464": "blood transfusion (14D)",
+    "iaml_super_40981": "OpenML-40981 (28D)",
+    "iaml_super_41146": "sylvine (28D)",
+}
+
+
+def load_yahpo(root: Path) -> pd.DataFrame:
+    frames = []
+    for dimension in (14, 28):
+        frame = load_contrasts(root / f"{dimension}d" / "paired_comparisons.csv")
+        frame["dimension"] = dimension
+        frames.append(frame)
+    return pd.concat(frames, ignore_index=True)
+
+
+def plot_yahpo(
+    frame: pd.DataFrame,
+    output_dir: Path,
+    stem: str,
+    note: str,
+) -> None:
+    fig = plt.figure(figsize=(WIDTH_FULL, 8.2))
+    grid = GridSpec(2, 6, figure=fig, hspace=0.68, wspace=0.58)
+    specifications = (
+        (grid[0, 0:2], "rbv2_xgboost_31"),
+        (grid[0, 2:4], "rbv2_xgboost_40975"),
+        (grid[0, 4:6], "rbv2_xgboost_1464"),
+        (grid[1, 1:3], "iaml_super_40981"),
+        (grid[1, 3:5], "iaml_super_41146"),
+    )
+    for slot, task in specifications:
+        draw_forest(
+            fig.add_subplot(slot),
+            frame[frame["task"] == task],
+            list(ACQUISITION_ORDER),
+            [ACQUISITION_LABELS[value] for value in ACQUISITION_ORDER],
+            key_column="acquisition",
+            title=YAHPO_TASK_LABELS[task],
+        )
+    for axis in fig.axes:
+        axis.set_xlabel("Endpoint loss improvement")
+    shared_legend(fig)
+    fig.text(0.5, 0.015, note, ha="center", color=TEXT_SECONDARY)
+    fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.10)
+    save_figure(fig, output_dir, stem)
+    plt.close(fig)
+
+
+def plot_lunar(path: Path, output_dir: Path) -> None:
+    frame = pd.read_csv(path)
+    frame = frame[frame["metric"] == "mean_return"].copy()
+    keys = (
+        ("decay_uniform_grid_a1_2", "standard"),
+        ("decay_greedy_packing_grid_a1_2", "standard"),
+        ("decay_greedy_packing_grid_a1_2", "decay_uniform_grid_a1_2"),
+    )
+    labels = tuple(value[0] for value in CONTRASTS)
+    fig, axis = plt.subplots(figsize=(WIDTH_TWO_THIRDS, 3.7))
+    axis.axvline(0.0, color=TEXT_SECONDARY, linewidth=1.0, linestyle="--", zorder=0)
+    for y, key, (_, color, marker, _) in zip(np.arange(3)[::-1], keys, CONTRASTS):
+        source = frame[(frame["policy"] == key[0]) & (frame["reference"] == key[1])].iloc[0]
+        row = pd.Series(
+            {
+                "improvement": source["paired_mean_difference"],
+                "ci_low": source["bootstrap_ci95_lower"],
+                "ci_high": source["bootstrap_ci95_upper"],
+            }
+        )
+        draw_point(axis, row, y, color, marker)
+    axis.set_yticks(np.arange(3)[::-1], labels)
+    axis.set_xlabel("Held-out mean-return improvement")
+    style_axis(axis, grid_axis="x")
+    fig.text(
+        0.5, 0.02,
+        "Thirty paired controllers on the same 200 unseen terrains. Positive favours the first method.",
+        ha="center", color=TEXT_SECONDARY,
+    )
+    fig.subplots_adjust(left=0.27, right=0.99, top=0.96, bottom=0.25)
+    save_figure(fig, output_dir, "fig_greedy_packing_lunar")
+    plt.close(fig)
+
+
+def plot_grid_confirmation(
+    synthetic_path: Path,
+    lunar_root: Path,
+    output_dir: Path,
+) -> None:
+    synthetic = pd.read_csv(synthetic_path)
+    fig = plt.figure(figsize=(WIDTH_FULL, 7.4))
+    grid = GridSpec(2, 6, figure=fig, hspace=0.72, wspace=0.62)
+    objective_specs = (
+        (grid[0, 0:2], "rastrigin", "Rastrigin"),
+        (grid[0, 2:4], "ackley", "Ackley"),
+        (grid[0, 4:6], "rosenbrock", "Rosenbrock"),
+    )
+    synthetic_contrasts = (
+        ("large_improvement_over_current", "Synthetic: 4x over default", "#C46D2D", "^", 0.10),
+        ("large_improvement_over_uniform", "Synthetic: 4x over Uniform", DIRECT_GREEN, "D", -0.10),
+    )
+    for slot, needle, title in objective_specs:
+        axis = fig.add_subplot(slot)
+        selected = synthetic[synthetic["objective"].str.contains(needle)]
+        axis.axvline(0.0, color=TEXT_SECONDARY, linewidth=1.0, linestyle="--", zorder=0)
+        for comparison, _, color, marker, offset in synthetic_contrasts:
+            rows = selected[selected["comparison"] == comparison].set_index("dimension")
+            for y, dimension in zip(np.arange(3)[::-1], (30, 10, 2)):
+                source = rows.loc[dimension]
+                draw_point(
+                    axis,
+                    pd.Series(
+                        {
+                            "improvement": source["mean_regret_improvement"],
+                            "ci_low": source["bootstrap_ci95_lower"],
+                            "ci_high": source["bootstrap_ci95_upper"],
+                        }
+                    ),
+                    y + offset,
+                    color,
+                    marker,
+                )
+        axis.set_yticks(np.arange(3)[::-1], ["30D", "10D", "2D"])
+        axis.set_title(title)
+        axis.set_xlabel("Endpoint regret improvement")
+        style_axis(axis, grid_axis="x")
+
+    lunar_axis = fig.add_subplot(grid[1, 1:5])
+    lunar_axis.axvline(0.0, color=TEXT_SECONDARY, linewidth=1.0, linestyle="--", zorder=0)
+    lunar_specs = (
+        ("Default: 256+16t", lunar_root / "grid2x" / "paired_comparisons.csv", "greedy_current"),
+        ("2x: 512+32t", lunar_root / "grid2x" / "paired_comparisons.csv", "greedy_2x"),
+        ("4x: 1024+64t", lunar_root / "grid4x" / "paired_comparisons.csv", "greedy_4x"),
+    )
+    lunar_contrasts = (
+        ("uniform", "Lunar: Greedy over Uniform", DIRECT_GREEN, "D", 0.10),
+        ("greedy_current", "Lunar: larger grid over default", "#C46D2D", "^", -0.10),
+    )
+    for y, (_, path, method) in zip(np.arange(3)[::-1], lunar_specs):
+        frame = pd.read_csv(path)
+        frame = frame[(frame["method"] == method) & (frame["metric"] == "mean_return")]
+        for reference, _, color, marker, offset in lunar_contrasts:
+            selected = frame[frame["reference"] == reference]
+            if selected.empty:
+                continue
+            source = selected.iloc[0]
+            draw_point(
+                lunar_axis,
+                pd.Series(
+                    {
+                        "improvement": source["paired_mean_difference"],
+                        "ci_low": source["bootstrap_ci95_lower"],
+                        "ci_high": source["bootstrap_ci95_upper"],
+                    }
+                ),
+                y + offset,
+                color,
+                marker,
+            )
+    lunar_axis.set_yticks(np.arange(3)[::-1], [value[0] for value in lunar_specs])
+    lunar_axis.set_title("Lunar Lander")
+    lunar_axis.set_xlabel("Held-out mean-return improvement")
+    style_axis(lunar_axis, grid_axis="x")
+
+    handles = [
+        Line2D([0], [0], marker=marker, color=color, linewidth=LINE_WIDTH,
+               markersize=MARKER_SIZE, label=label)
+        for _, label, color, marker, _ in synthetic_contrasts
+    ]
+    handles.extend(
+        Line2D([0], [0], marker=marker, color=color, linewidth=LINE_WIDTH,
+               markersize=MARKER_SIZE, label=label)
+        for _, label, color, marker, _ in lunar_contrasts
+    )
+    fig.legend(handles=handles, loc="upper center", ncol=4, bbox_to_anchor=(0.5, 0.99))
+    fig.text(
+        0.5, 0.02,
+        "Fifteen fresh paired seeds per panel. Positive values favour the first method named.",
+        ha="center", color=TEXT_SECONDARY,
+    )
+    fig.subplots_adjust(left=0.09, right=0.99, top=0.88, bottom=0.09)
+    save_figure(fig, output_dir, "fig_greedy_grid_confirmation")
     plt.close(fig)
 
 
@@ -329,6 +525,16 @@ def write_dimension_table(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--result-dir", type=Path, default=RESULT_DIR)
+    parser.add_argument(
+        "--yahpo-result-dir",
+        type=Path,
+        default=ROOT / "results" / "hpo_yahpo" / "greedy_packing",
+    )
+    parser.add_argument(
+        "--lunar-result-dir",
+        type=Path,
+        default=ROOT / "results" / "lunar" / "greedy_packing",
+    )
     parser.add_argument("--output-dir", type=Path, default=FIGURE_DIR)
     parser.add_argument("--table-dir", type=Path, default=TABLE_DIR)
     args = parser.parse_args()
@@ -370,6 +576,39 @@ def main() -> int:
         "Ten fresh paired seeds; settings were fixed using a disjoint seed block.",
     )
     plot_cross_benchmark(cross, args.output_dir)
+
+    plot_30d(
+        load_contrasts(
+            args.result_dir / "acquisition_30d_grid4x" / "paired_comparisons.csv"
+        ),
+        args.output_dir,
+        stem="fig_greedy_packing_acquisition_30d_grid4x",
+        note=(
+            "Ten paired seeds; Greedy uses the fourfold grid. Positive values "
+            "favour the first method named."
+        ),
+    )
+    plot_yahpo(
+        load_yahpo(args.yahpo_result_dir / "default"),
+        args.output_dir,
+        "fig_greedy_packing_yahpo",
+        "Thirty paired seeds. Positive values favour the first method named; panels use independent scales.",
+    )
+    plot_yahpo(
+        load_yahpo(args.yahpo_result_dir / "grid4x_fresh"),
+        args.output_dir,
+        "fig_yahpo_grid4x_confirmation",
+        "Fifteen fresh paired seeds with the fourfold grid. Positive values favour the first method named.",
+    )
+    plot_lunar(
+        args.lunar_result_dir / "default" / "paired_comparisons.csv",
+        args.output_dir,
+    )
+    plot_grid_confirmation(
+        args.result_dir / "grid4x_confirmation" / "summary.csv",
+        args.lunar_result_dir,
+        args.output_dir,
+    )
 
     write_summary_table(
         acquisition, args.table_dir / "tab_greedy_packing_30d_summary.tex"

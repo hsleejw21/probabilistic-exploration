@@ -39,9 +39,13 @@ results; the exact stage-specific settings are recorded in
 matched Standard and Uniform trials and adds Greedy Packing on Rastrigin from
 2D to 30D. The release also contains a fresh-seed Rastrigin validation and an
 exploratory transfer to Ackley and Rosenbrock. Preliminary setting-sweep
-outputs are intentionally excluded. Run `python scripts/plot_greedy_packing.py`
-after placing the audited aggregates in
-`results/synthetic/greedy_packing/`.
+outputs are intentionally excluded. The same plotting command also rebuilds
+the YAHPO, Lunar, and larger-grid confirmation figures from the audited
+aggregates in their domain-specific result directories:
+
+```bash
+python scripts/plot_greedy_packing.py
+```
 
 YAHPO also requires benchmark data downloaded through `yahpo-gym`; local data
 paths are machine-specific and are therefore not included in this repository.

@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "benchmark_family": "YAHPO Gym real-data HPO surrogate",
+  "tasks": {
+    "iaml_super_40981": {
+      "name": "iaml_super_40981",
+      "scenario": "iaml_super",
+      "instance": "40981",
+      "dataset_name": "OpenML-40981",
+      "target": "logloss",
+      "expected_dim": 28,
+      "parameters": [],
+      "constants": [
+        [
+          "task_id",
+          "40981"
+        ],
+        [
+          "trainsize",
+          1.0
+        ]
+      ]
+    },
+    "iaml_super_41146": {
+      "name": "iaml_super_41146",
+      "scenario": "iaml_super",
+      "instance": "41146",
+      "dataset_name": "sylvine",
+      "target": "logloss",
+      "expected_dim": 28,
+      "parameters": [],
+      "constants": [
+        [
+          "task_id",
+          "41146"
+        ],
+        [
+          "trainsize",
+          1.0
+        ]
+      ]
+    }
+  },
+  "acquisitions": [
+    "ucb",
+    "logei",
+    "ts",
+    "mes_gumbel"
+  ],
+  "ucb_beta_modes": [
+    "constant"
+  ],
+  "policies": [
+    "standard",
+    "decay_uniform_grid_a1_2",
+    "decay_greedy_packing_grid_a1_2"
+  ],
+  "num_seeds": 30,
+  "seed_start": 5,
+  "budget": 200,
+  "initial_design": "10 scrambled Sobol points, included in budget",
+  "objective": "minimize YAHPO-predicted validation log loss",
+  "gp_observation_noise": 0.0,
+  "gp_nugget_variance": 0.0001,
+  "signal_variance": "fixed at 1; lengthscales learned",
+  "gp_ts_protocol": "beta_t=log(t+1); fresh scrambled Sobol candidates; clip(ceil(64*sqrt(t)),128,512)",
+  "yahpo_data_version": "1.0.2",
+  "gp_config_by_dimension": {
+    "28": {
+      "budget_low": 50,
+      "budget_high": 100,
+      "budget_override": 200,
+      "n_initial": 10,
+      "budget_includes_initial": true,
+      "objective_value_scale": 1.0,
+      "noise_variance": 0.0,
+      "gp_nugget_variance": 0.0001,
+      "gp_backend": "sklearn",
+      "gp_input_space": "unit",
+      "normalize_y": false,
+      "center_y": true,
+      "matern_nu": 1.5,
+      "initial_lengthscale": 0.5,
+      "initial_signal_variance": 1.0,
+      "learn_signal_variance": false,
+      "lengthscale_bounds": [
+        0.01,
+        20.0
+      ],
+      "signal_variance_bounds": [
+        0.001,
+        1000.0
+      ],
+      "hyperopt_interval": 5,
+      "sklearn_n_restarts_optimizer": 2,
+      "jitter": 1e-08,
+      "optimizer_restarts": 20,
+      "recommendation_restarts": 20,
+      "recommendation_include_observed": true,
+      "optimizer_maxiter": 60,
+      "optimizer_start_design": "sobol",
+      "ts_candidates": 2048,
+      "ts_candidate_design": "sobol",
+      "ts_candidate_schedule": "sqrt",
+      "ts_candidate_min": 128,
+      "ts_candidate_growth_scale": 64.0,
+      "ts_candidate_max": 512,
+      "ts_rff_features": 1000,
+      "variance_candidates": 1024,
+      "greedy_packing_grid_initial": 256,
+      "greedy_packing_grid_growth": 16.0,
+      "greedy_packing_distance_batch_size": 2048,
+      "mes_num_max_samples": 100,
+      "mes_num_representer_points": 10000,
+      "mes_representer_design": "sobol",
+      "mes_min_std": 1e-10,
+      "beta_constant": 2.0,
+      "increasing_beta_scale": 1.0,
+      "logarithmic_beta_scale": 1.0
+    }
+  },
+  "software": {
+    "python": "3.11.15 | packaged by conda-forge | (main, Jun 11 2026, 03:34:02) [GCC 14.3.0]",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0",
+    "platform": "Linux-5.4.0-181-generic-x86_64-with-glibc2.31"
+  },
+  "sources": [
+    "https://github.com/slds-lmu/yahpo_gym",
+    "https://github.com/slds-lmu/yahpo_data/releases/tag/v1.0.2",
+    "https://proceedings.mlr.press/v188/pfisterer22a.html"
+  ],
+  "config_hash": "b6dcfb303c56705a"
+}

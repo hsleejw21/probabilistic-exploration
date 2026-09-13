@@ -1,0 +1,1 @@
+PASS trials=360, evaluations/trial=500, seeds=5-14, n_initial=2, signal_variance=1, paired_initial=True

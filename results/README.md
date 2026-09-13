@@ -9,6 +9,9 @@
 | scikit-learn HPO | Complete | Test transfer to real-data model tuning | metadata, audit, summary |
 | YAHPO high-dimensional HPO | Complete | Test transfer to 14D and 28D HPO surrogates | aggregate CSVs, audits, figures, and full protocol |
 | Synthetic Greedy Packing | Complete | Compare farthest-point PE with Standard and Uniform PE across 30D acquisitions, Rastrigin dimensions, fresh seeds, and cross-benchmark transfer | aggregate CSVs, audits, figures, and protocol |
+| YAHPO Greedy Packing | Complete | Compare Greedy PE with Standard and Uniform PE in 14D and 28D HPO | aggregate CSVs, audits, figures, and protocols |
+| Lunar Greedy Packing | Complete | Compare Greedy PE with Standard and Uniform PE on held-out terrains | aggregate CSVs, audit, figure, and protocol |
+| Larger-grid confirmation | Complete | Check whether twofold and fourfold finite grids change the Greedy conclusion | fresh-seed synthetic, YAHPO, and Lunar summaries |
 
 Positive differences favor the method named before “over” in each figure. The
 Greedy Packing figures show Uniform over Standard, Greedy over Standard, and

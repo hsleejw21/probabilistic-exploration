@@ -1,0 +1,1 @@
+PASS trials=1080, budget=120, rows=129600, n_initial=[10], signal_variance=1, paired_initial_design=true

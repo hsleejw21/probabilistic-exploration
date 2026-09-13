@@ -1,0 +1,10 @@
+policy,policy_label,reference,reference_label,metric,paired_mean_difference,bootstrap_ci95_lower,bootstrap_ci95_upper,wins,ties,losses
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,mean_return,49.58098753596889,23.7473528814672,76.91985089317308,18,0,12
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,episode_success_rate,0.18316666666666667,0.09000000000000001,0.287,21,0,9
+decay_uniform_grid_a1_2,Decay alpha=1/2,standard,Standard,bottom_10pct_mean_return,75.87344133820969,22.578333523180326,131.69914651169037,20,0,10
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,standard,Standard,mean_return,40.92106314685381,11.578299581466057,72.36287470017882,21,0,9
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,standard,Standard,episode_success_rate,0.14849999999999997,0.0415,0.26299999999999996,22,1,7
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,standard,Standard,bottom_10pct_mean_return,71.78144903885779,13.819621689989475,130.03801143657665,22,0,8
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,decay_uniform_grid_a1_2,Decay alpha=1/2,mean_return,-8.659924389115092,-32.16446976517892,12.802677479515475,17,0,13
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,decay_uniform_grid_a1_2,Decay alpha=1/2,episode_success_rate,-0.034666666666666665,-0.11466666666666665,0.036504166666666935,17,0,13
+decay_greedy_packing_grid_a1_2,Greedy Packing alpha=1/2,decay_uniform_grid_a1_2,Decay alpha=1/2,bottom_10pct_mean_return,-4.091992299351905,-59.1276098570439,47.99092516526805,17,0,13

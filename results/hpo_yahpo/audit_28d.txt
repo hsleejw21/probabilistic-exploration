@@ -1,1 +1,1 @@
-PASS /nfsdata/home/jungwoo.hong/study/bayesian_optimization/experiments/probabilistic_exploration/results/followup_2026_09_14/hpo_yahpo_highdim_ninitial10_v2/confirmation_28d_seed05_34: trials=960, budget=200, rows=192000, n_initial=[10], signal_variance=1, paired_initial_design=true
+PASS (source path omitted): trials=960, budget=200, rows=192000, n_initial=[10], signal_variance=1, paired_initial_design=true

@@ -1,0 +1,529 @@
+{
+  "schema_version": 2,
+  "benchmark_family": "YAHPO Gym real-data HPO surrogate",
+  "tasks": {
+    "rbv2_xgboost_31": {
+      "name": "rbv2_xgboost_31",
+      "scenario": "rbv2_xgboost",
+      "instance": "31",
+      "dataset_name": "credit-g",
+      "target": "logloss",
+      "expected_dim": 14,
+      "parameters": [
+        {
+          "name": "alpha",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "booster",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "gblinear",
+            "gbtree",
+            "dart"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "lambda",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "nrounds",
+          "kind": "integer",
+          "lower": 7,
+          "upper": 2981,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "num.impute.selected.cpo",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "impute.mean",
+            "impute.median",
+            "impute.hist"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "subsample",
+          "kind": "real",
+          "lower": 0.1,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bylevel",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bytree",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "eta",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "gamma",
+          "kind": "real",
+          "lower": 4.5399929762484854e-05,
+          "upper": 7.38905609893065,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "max_depth",
+          "kind": "integer",
+          "lower": 1,
+          "upper": 15,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "min_child_weight",
+          "kind": "real",
+          "lower": 2.718281828459045,
+          "upper": 148.4131591025766,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "rate_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "skip_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        }
+      ],
+      "constants": [
+        [
+          "task_id",
+          "31"
+        ],
+        [
+          "repl",
+          1
+        ],
+        [
+          "trainsize",
+          1.0
+        ]
+      ]
+    },
+    "rbv2_xgboost_40975": {
+      "name": "rbv2_xgboost_40975",
+      "scenario": "rbv2_xgboost",
+      "instance": "40975",
+      "dataset_name": "car",
+      "target": "logloss",
+      "expected_dim": 14,
+      "parameters": [
+        {
+          "name": "alpha",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "booster",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "gblinear",
+            "gbtree",
+            "dart"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "lambda",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "nrounds",
+          "kind": "integer",
+          "lower": 7,
+          "upper": 2981,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "num.impute.selected.cpo",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "impute.mean",
+            "impute.median",
+            "impute.hist"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "subsample",
+          "kind": "real",
+          "lower": 0.1,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bylevel",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bytree",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "eta",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "gamma",
+          "kind": "real",
+          "lower": 4.5399929762484854e-05,
+          "upper": 7.38905609893065,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "max_depth",
+          "kind": "integer",
+          "lower": 1,
+          "upper": 15,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "min_child_weight",
+          "kind": "real",
+          "lower": 2.718281828459045,
+          "upper": 148.4131591025766,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "rate_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "skip_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        }
+      ],
+      "constants": [
+        [
+          "task_id",
+          "40975"
+        ],
+        [
+          "repl",
+          1
+        ],
+        [
+          "trainsize",
+          1.0
+        ]
+      ]
+    },
+    "rbv2_xgboost_1464": {
+      "name": "rbv2_xgboost_1464",
+      "scenario": "rbv2_xgboost",
+      "instance": "1464",
+      "dataset_name": "blood-transfusion-service-center",
+      "target": "logloss",
+      "expected_dim": 14,
+      "parameters": [
+        {
+          "name": "alpha",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "booster",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "gblinear",
+            "gbtree",
+            "dart"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "lambda",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1096.6331584284585,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "nrounds",
+          "kind": "integer",
+          "lower": 7,
+          "upper": 2981,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "num.impute.selected.cpo",
+          "kind": "categorical",
+          "lower": null,
+          "upper": null,
+          "choices": [
+            "impute.mean",
+            "impute.median",
+            "impute.hist"
+          ],
+          "log_scale": false
+        },
+        {
+          "name": "subsample",
+          "kind": "real",
+          "lower": 0.1,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bylevel",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "colsample_bytree",
+          "kind": "real",
+          "lower": 0.01,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "eta",
+          "kind": "real",
+          "lower": 0.0009118819655545162,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "gamma",
+          "kind": "real",
+          "lower": 4.5399929762484854e-05,
+          "upper": 7.38905609893065,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "max_depth",
+          "kind": "integer",
+          "lower": 1,
+          "upper": 15,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "min_child_weight",
+          "kind": "real",
+          "lower": 2.718281828459045,
+          "upper": 148.4131591025766,
+          "choices": [],
+          "log_scale": true
+        },
+        {
+          "name": "rate_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        },
+        {
+          "name": "skip_drop",
+          "kind": "real",
+          "lower": 0.0,
+          "upper": 1.0,
+          "choices": [],
+          "log_scale": false
+        }
+      ],
+      "constants": [
+        [
+          "task_id",
+          "1464"
+        ],
+        [
+          "repl",
+          1
+        ],
+        [
+          "trainsize",
+          1.0
+        ]
+      ]
+    }
+  },
+  "acquisitions": [
+    "ucb",
+    "ts",
+    "logei",
+    "mes_gumbel"
+  ],
+  "ucb_beta_modes": [
+    "constant"
+  ],
+  "policies": [
+    "standard",
+    "decay_uniform_grid_a1_2",
+    "decay_greedy_packing_grid_a1_2"
+  ],
+  "num_seeds": 15,
+  "seed_start": 35,
+  "budget": 120,
+  "initial_design": "10 scrambled Sobol points, included in budget",
+  "objective": "minimize YAHPO-predicted validation log loss",
+  "gp_observation_noise": 0.0,
+  "gp_nugget_variance": 0.0001,
+  "signal_variance": "fixed at 1; lengthscales learned",
+  "gp_ts_protocol": "beta_t=log(t+1); fresh scrambled Sobol candidates; clip(ceil(64*sqrt(t)),128,512)",
+  "yahpo_data_version": "1.0.2",
+  "gp_config_by_dimension": {
+    "14": {
+      "budget_low": 50,
+      "budget_high": 100,
+      "budget_override": 120,
+      "n_initial": 10,
+      "budget_includes_initial": true,
+      "objective_value_scale": 1.0,
+      "noise_variance": 0.0,
+      "gp_nugget_variance": 0.0001,
+      "gp_backend": "sklearn",
+      "gp_input_space": "unit",
+      "normalize_y": false,
+      "center_y": true,
+      "matern_nu": 1.5,
+      "initial_lengthscale": 0.5,
+      "initial_signal_variance": 1.0,
+      "learn_signal_variance": false,
+      "lengthscale_bounds": [
+        0.01,
+        20.0
+      ],
+      "signal_variance_bounds": [
+        0.001,
+        1000.0
+      ],
+      "hyperopt_interval": 5,
+      "sklearn_n_restarts_optimizer": 2,
+      "jitter": 1e-08,
+      "optimizer_restarts": 20,
+      "recommendation_restarts": 20,
+      "recommendation_include_observed": true,
+      "optimizer_maxiter": 60,
+      "optimizer_start_design": "sobol",
+      "ts_candidates": 2048,
+      "ts_candidate_design": "sobol",
+      "ts_candidate_schedule": "sqrt",
+      "ts_candidate_min": 128,
+      "ts_candidate_growth_scale": 64.0,
+      "ts_candidate_max": 512,
+      "ts_rff_features": 1000,
+      "variance_candidates": 1024,
+      "greedy_packing_grid_initial": 1024,
+      "greedy_packing_grid_growth": 64.0,
+      "greedy_packing_distance_batch_size": 2048,
+      "mes_num_max_samples": 100,
+      "mes_num_representer_points": 10000,
+      "mes_representer_design": "sobol",
+      "mes_min_std": 1e-10,
+      "beta_constant": 2.0,
+      "increasing_beta_scale": 1.0,
+      "logarithmic_beta_scale": 1.0
+    }
+  },
+  "software": {
+    "python": "3.11.15 | packaged by conda-forge | (main, Jun 11 2026, 03:34:02) [GCC 14.3.0]",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0",
+    "platform": "Linux-5.4.0-181-generic-x86_64-with-glibc2.31"
+  },
+  "sources": [
+    "https://github.com/slds-lmu/yahpo_gym",
+    "https://github.com/slds-lmu/yahpo_data/releases/tag/v1.0.2",
+    "https://proceedings.mlr.press/v188/pfisterer22a.html"
+  ],
+  "config_hash": "fab658854600a7a3"
+}

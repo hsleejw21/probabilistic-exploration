@@ -1,0 +1,27 @@
+{
+  "study": "finite-grid Greedy Packing PE on Lunar Lander",
+  "benchmark": "TuRBO Lunar Lander heuristic controller",
+  "dimension": 12,
+  "acquisition": "LogEI",
+  "policies": [
+    "Standard",
+    "Uniform PE alpha=1/2",
+    "Greedy Packing PE alpha=1/2"
+  ],
+  "signal_variance": 1.0,
+  "learn_signal_variance": false,
+  "n_initial": 24,
+  "initial_design": "scrambled Sobol",
+  "evaluation_steps_including_initial": 400,
+  "training_terrains_per_evaluation": 50,
+  "heldout_terrains_per_controller": 200,
+  "paired_training_seeds": 30,
+  "grid_confirmation_seeds": 15,
+  "greedy_grids": {
+    "default": "256 + ceil(16 t)",
+    "grid2x": "512 + ceil(32 t)",
+    "grid4x": "1024 + ceil(64 t)"
+  },
+  "pairing": "Policies share initial observations within a BO seed; held-out controllers share the same episode bank",
+  "sign_convention": "positive paired mean difference favors the named candidate"
+}

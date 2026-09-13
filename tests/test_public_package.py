@@ -126,3 +126,38 @@ def test_completed_yahpo_28d_release_is_audited():
     assert audit.startswith("PASS ")
     assert "trials=960" in audit
     assert "budget=200" in audit
+
+
+def test_greedy_application_results_are_complete_and_audited():
+    root = Path(__file__).resolve().parents[1] / "results"
+    yahpo = root / "hpo_yahpo" / "greedy_packing"
+    expected_rows = {14: 36, 28: 24}
+    for stage, expected_seeds in (("default", 30), ("grid4x_fresh", 15)):
+        for dimension, expected_comparisons in expected_rows.items():
+            directory = yahpo / stage / f"{dimension}d"
+            protocol = json.loads((directory / "protocol.json").read_text())
+            assert protocol["num_seeds"] == expected_seeds
+            with (directory / "paired_comparisons.csv").open(newline="") as handle:
+                assert len(list(csv.DictReader(handle))) == expected_comparisons
+            assert (directory / "audit.txt").read_text().startswith("PASS ")
+
+    lunar = root / "lunar" / "greedy_packing"
+    protocol = json.loads((lunar / "protocol.json").read_text())
+    assert protocol["paired_training_seeds"] == 30
+    assert protocol["heldout_terrains_per_controller"] == 200
+    with (lunar / "default" / "paired_comparisons.csv").open(newline="") as handle:
+        assert len(list(csv.DictReader(handle))) == 9
+
+    synthetic = root / "synthetic" / "greedy_packing" / "grid4x_confirmation"
+    with (synthetic / "summary.csv").open(newline="") as handle:
+        assert len(list(csv.DictReader(handle))) == 18
+
+
+def test_public_text_artifacts_do_not_contain_server_paths():
+    root = Path(__file__).resolve().parents[1]
+    extensions = {".csv", ".json", ".md", ".py", ".tex", ".txt", ".tsv"}
+    private_prefix = "/" + "nfsdata" + "/ho" + "me/"
+    for path in root.rglob("*"):
+        if path.is_file() and path.suffix in extensions and ".git" not in path.parts:
+            text = path.read_text(errors="ignore")
+            assert private_prefix not in text, path

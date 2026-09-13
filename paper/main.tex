@@ -59,8 +59,11 @@ remain tied or inconclusive. The current evidence therefore supports PE as a
 useful option, but does not yet support a universal rule for choosing $\alpha$.
 Finite-grid Greedy Packing is strongly problem-dependent. It helps Rastrigin,
 especially in 10D and 30D, and preserves PE gains for several 30D Sparse
-Hartmann acquisitions. However, the same schedule transfers poorly to Ackley
-and Rosenbrock, so it is less reliable than Uniform PE as a default.
+Hartmann acquisitions. It also gives selective gains on 28D YAHPO, while both
+Uniform and Greedy PE improve over Standard on Lunar. However, the same
+schedule transfers poorly to Ackley and Rosenbrock, and a fourfold larger grid
+does not remove this dependence. Greedy is therefore less reliable than
+Uniform PE as a default.
 
 \textbf{Protocol.} GP signal variance fixed to $1$ and not learned, so
 $k(x,x)\le 1$; lengthscales learned; GP inputs mapped to $[0,1]^d$; scrambled
@@ -614,9 +617,10 @@ This is an efficient adaptation of Algorithm~1 in
 \href{https://arxiv.org/abs/2112.10401}{Pronzato and Zhigljavsky (2021)}.
 Their Theorem~3.8 relates finite-grid quality to the grid fill distance. We use
 the practical linear schedule $|G_t|=256+\lceil16t\rceil$. All experiments in
-this section fix signal variance to one and use two initial points. Within each
-objective, acquisition, and seed, Standard, Uniform PE, and Greedy Packing PE
-share the initial observations and observation-noise stream. Every figure uses
+this section fix signal variance to one. Synthetic experiments use two initial
+points, YAHPO uses ten, and Lunar uses 24. Within each objective, acquisition,
+and seed, Standard, Uniform PE, and Greedy Packing PE share the initial
+observations and observation-noise stream. Every figure uses
 the same sign convention: positive values favor the first method named. Thus,
 the three markers separately show whether Uniform PE improves on Standard,
 whether Greedy Packing PE improves on Standard, and whether Greedy Packing PE
@@ -757,9 +761,99 @@ settings and is worse in three. Against Uniform, it is better once, worse seven
 times, and inconclusive twice. Because this stage has only five seeds, it is
 best read as a transfer check rather than a final benchmark comparison.
 
-Overall, Greedy Packing can be effective on a multimodal Rastrigin landscape,
-but its gains do not transfer reliably across functions. Uniform sampling
-therefore remains the more reliable general-purpose PE rule in the current
-evidence; Greedy Packing is a promising problem-dependent option.
+\subsection{Transfer to YAHPO and Lunar Lander}
+
+We next reuse the matched Standard and Uniform arms in the application studies
+and evaluate Greedy PE with $\alpha=1/2$. YAHPO uses the same four acquisitions,
+tasks, initial designs, budgets, and 30 seeds described in
+Section~\ref{sec:hpo}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_greedy_packing_yahpo.pdf}
+  \caption{Greedy Packing on the 14D and 28D YAHPO tasks. Each panel separates
+  the PE effect relative to Standard from the point-rule effect relative to
+  Uniform.}
+  \label{fig:greedyyahpo}
+\end{figure}
+
+In 14D, Greedy improves over Standard in 4 of 12 cells and is worse in 2. In
+28D, it improves in 4 of 8 cells with no clear loss. Direct gains over Uniform
+occur in only two cells. The 28D result is encouraging, but it does not show a
+general Greedy advantage.
+
+The Lunar comparison uses LogEI, 24 initial points, 400 evaluations, and 30
+paired seeds. Each BO value averages 50 fixed terrains; the final controllers
+are evaluated on 200 shared terrains not used during optimisation.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.72\textwidth]{figures/fig_greedy_packing_lunar.pdf}
+  \caption{Paired held-out mean-return comparisons on Lunar Lander.}
+  \label{fig:greedylunar}
+\end{figure}
+
+Uniform and Greedy improve held-out return over Standard by $+49.6$
+$[23.7,76.9]$ and $+40.9$ $[11.6,72.4]$. Solved controllers rise from 20/30
+to 27/30 and 24/30. Their direct difference is inconclusive: PE works here,
+but Greedy is not better than Uniform.
+
+\subsection{Does a larger finite grid change the conclusion?}
+
+The default grid is a computational choice rather than a fixed property of the
+method. We therefore repeat the 30D acquisition panel with the fourfold schedule
+$|G_t|=1024+\lceil64t\rceil$, reusing paired Standard and Uniform trajectories.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_greedy_packing_acquisition_30d_grid4x.pdf}
+  \caption{The 30D acquisition panel with the fourfold Greedy grid. Positive
+  values favor the first method named.}
+  \label{fig:greedy30dgrid4x}
+\end{figure}
+
+Enlarging the grid does not repair the 30D result. Greedy improves over
+Standard in 3 cells but is worse in 6; it never clearly beats Uniform and is
+worse in 9. Uniform remains the safer rule in this panel.
+
+We then run independent confirmations. The synthetic check uses GP-UCB on
+Rastrigin, Ackley, and Rosenbrock in 2D, 10D, and 30D with 15 new seeds. Lunar
+uses LogEI and 15 paired seeds. Both compare larger grids with default Greedy
+and Uniform under otherwise unchanged BO settings.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_greedy_grid_confirmation.pdf}
+  \caption{Independent large-grid confirmation on synthetic functions and
+  Lunar Lander. Filled markers have paired 95\% intervals excluding zero.}
+  \label{fig:gridconfirmation}
+\end{figure}
+
+The fourfold grid beats Uniform on Rastrigin-10D/30D, but loses on all three
+Ackley dimensions and Rosenbrock-10D/30D. On Lunar, it improves over default
+Greedy by $+33.7$ $[1.1,72.1]$, but not clearly over Uniform. A larger grid can
+repair a coarse approximation on some problems, not make Greedy universally
+better.
+
+Finally, Standard, Uniform, and fourfold-grid Greedy are recomputed on 15 fresh
+YAHPO seeds with unchanged tasks, acquisitions, initial designs, and budgets.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_yahpo_grid4x_confirmation.pdf}
+  \caption{Fresh-seed YAHPO confirmation with the fourfold Greedy grid.
+  Positive values favor the first method named.}
+  \label{fig:yahpogridconfirmation}
+\end{figure}
+
+The 14D block remains mixed. In 28D, Greedy improves over Standard in 4 of 8
+cells and over Uniform in two GP-TS cells, with no clear loss. The strongest
+large-grid evidence is therefore specific to 28D YAHPO.
+
+Overall, Greedy Packing can be effective on Rastrigin and selected 28D HPO
+problems, but its gains do not transfer reliably across functions. Increasing
+the grid size does not remove this dependence. Uniform sampling therefore
+remains the more reliable general-purpose PE rule in the current evidence;
+Greedy Packing is a promising problem-dependent option.
 
 \end{document}

@@ -9,7 +9,10 @@
     {"id": "lunar_12d", "status": "complete"},
     {"id": "sklearn_hpo", "status": "complete"},
     {"id": "yahpo_highdim_hpo", "status": "complete"},
-    {"id": "synthetic_greedy_packing", "status": "complete", "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"}
+    {"id": "synthetic_greedy_packing", "status": "complete", "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"},
+    {"id": "yahpo_greedy_packing", "status": "complete", "scope": "14D and 28D; default grid on 30 seeds; fourfold grid on 15 fresh seeds"},
+    {"id": "lunar_greedy_packing", "status": "complete", "scope": "LogEI; 30 paired controllers; 200 held-out terrains per controller"},
+    {"id": "greedy_grid_robustness", "status": "complete", "scope": "default, twofold, and fourfold finite-grid checks across synthetic, YAHPO, and Lunar studies"}
   ],
   "excluded": [
     "quota and qplus methods",
