@@ -131,5 +131,10 @@ def style_axis(axis, *, grid_axis: str = "y") -> None:
 
 def save_figure(fig, output_dir: Path, stem: str) -> None:
     """Write matching vector and raster versions with shared export settings."""
-    fig.savefig(output_dir / f"{stem}.pdf")
+    pdf_metadata = {
+        "Creator": "probabilistic-exploration",
+        "CreationDate": None,
+        "ModDate": None,
+    }
+    fig.savefig(output_dir / f"{stem}.pdf", metadata=pdf_metadata)
     fig.savefig(output_dir / f"{stem}.png")

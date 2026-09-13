@@ -459,8 +459,8 @@ def format_effect(row: pd.Series) -> str:
     if row["ci_low"] > 0:
         return rf"\pewin{{{text}}}"
     if row["ci_high"] < 0:
-        return rf"\peloss{{{text}}}"
-    return rf"\pesoft{{{text}}}"
+        return rf"\stdwin{{{text}}}"
+    return rf"\pesoft{{{text}}}" if row["improvement"] >= 0 else rf"\stdsoft{{{text}}}"
 
 
 def classification(row: pd.Series) -> str:
