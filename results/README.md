@@ -8,7 +8,10 @@
 | Lunar Lander 12D | Complete | Test transfer to simulation-based controller tuning | figures and report tables |
 | scikit-learn HPO | Complete | Test transfer to real-data model tuning | metadata, audit, summary |
 | YAHPO high-dimensional HPO | Complete | Test transfer to 14D and 28D HPO surrogates | aggregate CSVs, audits, figures, and full protocol |
+| Synthetic Greedy Packing | Complete | Compare farthest-point PE with Standard and Uniform PE across 30D acquisitions, Rastrigin dimensions, fresh seeds, and cross-benchmark transfer | aggregate CSVs, audits, figures, and protocol |
 
-Positive differences in comparison figures mean **PE is better than Standard**.
-Raw trial histories are intentionally omitted because of size; each included
-completed study retains its aggregate outputs and audit record.
+Positive differences favor the method named before “over” in each figure. The
+Greedy Packing figures show Uniform over Standard, Greedy over Standard, and
+Greedy over Uniform together. Raw trial histories and preliminary Greedy
+setting sweeps are intentionally omitted; each included completed study retains
+its final protocol, aggregate outputs, and audit record.

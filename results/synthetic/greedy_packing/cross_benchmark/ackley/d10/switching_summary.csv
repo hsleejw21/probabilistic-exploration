@@ -1,0 +1,16 @@
+objective,acquisition,beta_mode,policy,seed,dimension,exploration_rule,decay_exponent,bo_steps,actual_pe_calls,expected_pe_calls,realized_pe_fraction,first_pe_round,last_pe_round,mode_transitions
+ackley_shifted_narrow_10d,ucb,constant,decay_greedy_packing_grid_a2_3,0,10,greedy_packing,0.6666666666666666,400,65,75.21337704939067,0.1625,2.0,399.0,104
+ackley_shifted_narrow_10d,ucb,constant,decay_greedy_packing_grid_a2_3,1,10,greedy_packing,0.6666666666666666,400,73,75.21337704939067,0.1825,1.0,398.0,101
+ackley_shifted_narrow_10d,ucb,constant,decay_greedy_packing_grid_a2_3,2,10,greedy_packing,0.6666666666666666,400,89,75.21337704939067,0.2225,1.0,396.0,133
+ackley_shifted_narrow_10d,ucb,constant,decay_greedy_packing_grid_a2_3,3,10,greedy_packing,0.6666666666666666,400,68,75.21337704939067,0.17,1.0,393.0,99
+ackley_shifted_narrow_10d,ucb,constant,decay_greedy_packing_grid_a2_3,4,10,greedy_packing,0.6666666666666666,400,87,75.21337704939067,0.2175,1.0,389.0,123
+ackley_shifted_narrow_10d,ucb,constant,decay_uniform_grid_a2_3,0,10,uniform,0.6666666666666666,400,65,75.21337704939067,0.1625,2.0,399.0,104
+ackley_shifted_narrow_10d,ucb,constant,decay_uniform_grid_a2_3,1,10,uniform,0.6666666666666666,400,73,75.21337704939067,0.1825,1.0,398.0,101
+ackley_shifted_narrow_10d,ucb,constant,decay_uniform_grid_a2_3,2,10,uniform,0.6666666666666666,400,89,75.21337704939067,0.2225,1.0,396.0,133
+ackley_shifted_narrow_10d,ucb,constant,decay_uniform_grid_a2_3,3,10,uniform,0.6666666666666666,400,68,75.21337704939067,0.17,1.0,393.0,99
+ackley_shifted_narrow_10d,ucb,constant,decay_uniform_grid_a2_3,4,10,uniform,0.6666666666666666,400,87,75.21337704939067,0.2175,1.0,389.0,123
+ackley_shifted_narrow_10d,ucb,constant,standard,0,10,none,,400,0,0.0,0.0,,,0
+ackley_shifted_narrow_10d,ucb,constant,standard,1,10,none,,400,0,0.0,0.0,,,0
+ackley_shifted_narrow_10d,ucb,constant,standard,2,10,none,,400,0,0.0,0.0,,,0
+ackley_shifted_narrow_10d,ucb,constant,standard,3,10,none,,400,0,0.0,0.0,,,0
+ackley_shifted_narrow_10d,ucb,constant,standard,4,10,none,,400,0,0.0,0.0,,,0

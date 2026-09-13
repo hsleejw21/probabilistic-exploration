@@ -21,8 +21,10 @@ change when the report is reorganised.
 - Standard is dashed grey. Decay policies use the shared light-to-dark blue
   palette, and fixed `p=0.2` is orange. A policy never changes colour between
   studies.
-- Every difference is written as **PE improvement over Standard**, so positive
-  values favour PE.
+- Comparisons against Standard are written as **PE improvement over Standard**.
+  Direct PE ablations name their baseline explicitly, for example **Greedy
+  Packing improvement over Uniform PE**. Positive always favours the method
+  named before “over”.
 - In point-and-interval figures, a hollow point means that the 95% interval
   contains zero; a filled point means that it excludes zero.
 - In heatmaps, blue favours PE, red favours Standard, and a black outline means

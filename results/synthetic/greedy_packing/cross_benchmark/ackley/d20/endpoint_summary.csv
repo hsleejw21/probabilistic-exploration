@@ -1,0 +1,4 @@
+objective,acquisition,beta_mode,policy,n_seeds,mean,median,std
+ackley_shifted_narrow_20d,ucb,constant,decay_greedy_packing_grid_a1_2,5,4.613283432940298,4.643764936370342,0.8727724343256408
+ackley_shifted_narrow_20d,ucb,constant,decay_uniform_grid_a1_2,5,2.940800265745134,2.756958199573134,0.9068184426364355
+ackley_shifted_narrow_20d,ucb,constant,standard,5,3.027020202426013,3.05723366560234,0.9659712644938298

@@ -1,20 +1,22 @@
 {
   "title": "Probabilistic Exploration for Efficient Bayesian Optimization",
-  "as_of": "2026-09-09",
-  "sign_convention": "positive means PE outperforms Standard",
+  "as_of": "2026-09-14",
+  "sign_convention": "positive favors the first method named; Greedy Packing figures show Uniform over Standard, Greedy over Standard, and Greedy over Uniform",
   "included": [
     {"id": "synthetic_acquisition_30d", "status": "complete", "gp_ts": "logarithmic beta and growing fresh Sobol candidates"},
     {"id": "synthetic_dimension_alpha", "status": "complete"},
     {"id": "synthetic_practical_alpha", "status": "exploratory"},
     {"id": "lunar_12d", "status": "complete"},
     {"id": "sklearn_hpo", "status": "complete"},
-    {"id": "yahpo_highdim_hpo", "status": "complete"}
+    {"id": "yahpo_highdim_hpo", "status": "complete"},
+    {"id": "synthetic_greedy_packing", "status": "complete", "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"}
   ],
   "excluded": [
     "quota and qplus methods",
     "Rover experiments",
     "older fixed-beta GP-TS runs",
     "stopped optional 1000-evaluation 30D GP-TS run",
-    "separately supplied professor-code comparison"
+    "separately supplied professor-code comparison",
+    "preliminary Greedy Packing setting sweeps"
   ]
 }

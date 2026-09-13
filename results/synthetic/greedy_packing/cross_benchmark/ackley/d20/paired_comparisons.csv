@@ -1,0 +1,4 @@
+objective,acquisition,beta_mode,baseline_policy,candidate_policy,n_pairs,mean_difference_candidate_minus_baseline,bootstrap_ci95_lower,bootstrap_ci95_upper,candidate_wins,ties,candidate_losses
+ackley_shifted_narrow_20d,ucb,constant,standard,decay_uniform_grid_a1_2,5,-0.08621993668087882,-1.3476508104458063,0.88576243839392,2,0,3
+ackley_shifted_narrow_20d,ucb,constant,standard,decay_greedy_packing_grid_a1_2,5,1.5862632305142852,0.8424290461134131,2.4171031812927213,0,0,5
+ackley_shifted_narrow_20d,ucb,constant,decay_uniform_grid_a1_2,decay_greedy_packing_grid_a1_2,5,1.672483167195164,0.1240448966742533,2.979679516696895,1,0,4

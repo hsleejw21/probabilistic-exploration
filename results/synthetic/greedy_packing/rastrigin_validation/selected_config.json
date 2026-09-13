@@ -1,0 +1,16 @@
+[
+  {
+    "dimension": 10,
+    "growth": 4,
+    "alpha_slug": "1_2",
+    "policy": "decay_greedy_packing_grid_a1_2",
+    "mean_inference_regret": 1.901723784439516
+  },
+  {
+    "dimension": 30,
+    "growth": 16,
+    "alpha_slug": "1_2",
+    "policy": "decay_greedy_packing_grid_a1_2",
+    "mean_inference_regret": 3.4007284954702746
+  }
+]

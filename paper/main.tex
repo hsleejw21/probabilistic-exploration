@@ -37,13 +37,15 @@
 
 \section{Research questions, conclusions, and protocol}
 
-This report addresses two research questions. First, does PE help
+This report addresses three research questions. First, does PE help
 beyond a single objective or acquisition function? Second, can the decay
 exponent $\alpha$ be related to dimension or selected reliably from a small
-pilot? Sections~\ref{sec:acq}--\ref{sec:dimalpha} address the first question,
+pilot? Third, can a more evenly spaced exploration design improve on Uniform
+sampling? Sections~\ref{sec:acq}--\ref{sec:dimalpha} address the first question,
 Section~\ref{sec:choice} addresses the second, and
 Sections~\ref{sec:external} and \ref{sec:hpo} test transfer to Lunar Lander
-controller tuning and hyperparameter optimisation.
+controller tuning and hyperparameter optimisation. Section~\ref{sec:packing}
+addresses the third question.
 
 \textbf{Main conclusions.} PE improves GP-UCB, LogEI, and MES-Gumbel on
 multiple 30D objectives. With the theory-aligned GP-TS implementation, the
@@ -55,6 +57,10 @@ settings, mainly by reducing high-loss failures on one dataset. In 28D, decay
 $\alpha=1/2$ improves LogEI and GP-TS on \texttt{sylvine}, but most other cells
 remain tied or inconclusive. The current evidence therefore supports PE as a
 useful option, but does not yet support a universal rule for choosing $\alpha$.
+Finite-grid Greedy Packing is strongly problem-dependent. It helps Rastrigin,
+especially in 10D and 30D, and preserves PE gains for several 30D Sparse
+Hartmann acquisitions. However, the same schedule transfers poorly to Ackley
+and Rosenbrock, so it is less reliable than Uniform PE as a default.
 
 \textbf{Protocol.} GP signal variance fixed to $1$ and not learned, so
 $k(x,x)\le 1$; lengthscales learned; GP inputs mapped to $[0,1]^d$; scrambled
@@ -592,5 +598,168 @@ $[0.0012,0.0099]$ and GP-TS by $0.0103$ $[0.0029,0.0174]$. GP-TS wins 21 of
 many policies reach the same endpoint, and all Fixed $p=0.2$ comparisons are
 inconclusive. The 28D evidence therefore extends the positive HPO result to
 GP-TS, but again shows that the benefit is task- and acquisition-dependent.
+
+\section{Can Greedy Packing replace Uniform exploration?}
+\label{sec:packing}
+
+\setup On a PE round, Uniform PE draws an independent uniform point. We
+replace it by a finite-grid version of Greedy Packing: from a nested Sobol grid
+$G_t$, select the candidate farthest in Euclidean distance from every input
+evaluated so far,
+\[
+x_t^{\mathrm{PE}}\in\arg\max_{x\in G_t}
+\min_{z\in D_{t-1}}\lVert x-z\rVert_2.
+\]
+This is an efficient adaptation of Algorithm~1 in
+\href{https://arxiv.org/abs/2112.10401}{Pronzato and Zhigljavsky (2021)}.
+Their Theorem~3.8 relates finite-grid quality to the grid fill distance. We use
+the practical linear schedule $|G_t|=256+\lceil16t\rceil$. All experiments in
+this section fix signal variance to one and use two initial points. Within each
+objective, acquisition, and seed, Standard, Uniform PE, and Greedy Packing PE
+share the initial observations and observation-noise stream. Every figure uses
+the same sign convention: positive values favor the first method named. Thus,
+the three markers separately show whether Uniform PE improves on Standard,
+whether Greedy Packing PE improves on Standard, and whether Greedy Packing PE
+improves on Uniform PE.
+
+\subsection{30D comparison across acquisition functions}
+
+We first test Shifted Bent Cigar, Sparse Hartmann, and Rosenbrock with GP-UCB,
+theory-aligned GP-TS, LogEI, and MES-Gumbel. The decay exponent is
+$\alpha=1/2$, with 500 total evaluation steps and ten paired seeds. Existing
+Standard and Uniform trials are reused; only the Greedy Packing arm is newly
+evaluated.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_greedy_packing_acquisition_30d.pdf}
+  \caption{Three paired endpoint comparisons in the 30D Greedy Packing study.
+  Positive values favor the first method named. Filled markers have paired
+  95\% intervals excluding zero; panels use independent horizontal scales.}
+  \label{fig:greedypacking30d}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/tab_greedy_packing_30d_summary}
+\caption{Number of 30D objective--acquisition settings classified by paired
+95\% confidence intervals. ``Better'' and ``Worse'' refer to the first method
+named in each row.}
+\label{tab:greedypacking30d}
+\end{table}
+
+\findings\ Uniform PE improves significantly over Standard in 8 of 12 settings
+and is never significantly worse. Greedy Packing PE improves in 3 settings,
+is worse in 5, and is inconclusive in 4. All three clear Greedy gains occur on
+Sparse Hartmann: LogEI, MES-Gumbel, and GP-UCB each improve on all ten paired
+seeds. Against Uniform PE directly, Greedy Packing is never significantly
+better and is significantly worse in 7 of 12 settings. The broadly positive
+Uniform result shows that this is a limitation of the point-selection rule,
+not evidence against PE itself.
+
+\subsection{Rastrigin across dimensions}
+
+The second comparison uses rotated shifted Rastrigin in 2D, 5D, 10D, 20D, and
+30D with GP-UCB. We reuse 15-seed Standard and Uniform trials and evaluate only
+the matching Greedy arm. Each run has 402 total evaluations, including two
+initial points. The decay exponents are the values already used in the matched
+Uniform study: $1/2$, $1$, $2/3$, $1/2$, and $5/6$, respectively.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{figures/fig_greedy_packing_rastrigin_dimensions.pdf}
+  \caption{Greedy Packing on Rastrigin from 2D to 30D. Positive values favor
+  the first method named; filled markers have paired 95\% intervals excluding
+  zero.}
+  \label{fig:greedypackingdimensions}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/tab_greedy_packing_rastrigin_dimensions}
+\caption{Mean endpoint inference regret on Rastrigin. G--S and G--U denote
+Greedy improvement over Standard and Uniform, respectively. Lower regret and
+positive improvement are better.}
+\label{tab:greedypackingdimensions}
+\end{table}
+
+Greedy Packing clearly improves over Standard in 2D, 10D, and 30D. Its direct
+advantage over Uniform is clear in 10D and 30D, with improvements of $5.167$
+$[3.813,6.395]$ and $2.321$ $[0.597,4.061]$. The 5D and 20D comparisons are
+inconclusive. This confirms that Greedy Packing can be useful, but that its
+effect varies with dimension even within one benchmark family.
+
+\subsection{Independent validation of selected settings}
+
+To check that the strongest Rastrigin findings were not caused only by the
+original seeds, we fixed one setting for 10D and one for 30D using a separate
+five-seed block, then evaluated them on ten new seeds. The fixed settings are
+$\alpha=1/2$ with grid-growth coefficient $c=4$ in 10D and $c=16$ in 30D,
+where $|G_t|=256+\lceil ct\rceil$. The preliminary setting comparisons are not
+included; only the chosen conditions and their fresh-seed evaluation are
+reported.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{figures/fig_greedy_packing_rastrigin_validation.pdf}
+  \caption{Fresh-seed validation of two fixed Greedy Packing settings on
+  Rastrigin. Positive values favor the first method named; filled markers have
+  paired 95\% intervals excluding zero.}
+  \label{fig:greedypackingvalidation}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\input{tables/tab_greedy_packing_rastrigin_validation}
+\caption{Fresh-seed endpoint results for the selected settings. The grid size
+is $256+\lceil ct\rceil$. Lower regret and positive improvement are better.}
+\label{tab:greedypackingvalidation}
+\end{table}
+
+In 10D, Greedy improves over Standard by $3.701$
+$[1.684,5.619]$; its comparison with Uniform is positive but inconclusive. In
+30D, Greedy improves over Uniform by $3.924$ $[1.704,6.004]$; its comparison
+with Standard is positive but inconclusive. The fresh seeds therefore retain
+a Greedy advantage, although the exact significant comparison differs by
+dimension.
+
+\subsection{Transfer to Ackley and Rosenbrock}
+
+Finally, we transfer the Rastrigin decay schedule and the default $c=16$
+unchanged to Shifted Ackley and Rosenbrock from 2D to 30D. This is an
+exploratory five-seed test of whether the Rastrigin result generalizes without
+retuning.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig_greedy_packing_cross_benchmark.pdf}
+  \caption{Transfer of the Rastrigin Greedy Packing schedule to Shifted Ackley
+  and Rosenbrock. Positive values favor the first method named; filled markers
+  have paired 95\% intervals excluding zero.}
+  \label{fig:greedypackingtransfer}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/tab_greedy_packing_cross_benchmark_summary}
+\caption{Number of transferred benchmark--dimension settings classified by
+paired 95\% intervals. ``Better'' and ``Worse'' refer to the first method
+named in each row.}
+\label{tab:greedypackingtransfer}
+\end{table}
+
+Greedy is not significantly better than Standard in any of the ten transferred
+settings and is worse in three. Against Uniform, it is better once, worse seven
+times, and inconclusive twice. Because this stage has only five seeds, it is
+best read as a transfer check rather than a final benchmark comparison.
+
+Overall, Greedy Packing can be effective on a multimodal Rastrigin landscape,
+but its gains do not transfer reliably across functions. Uniform sampling
+therefore remains the more reliable general-purpose PE rule in the current
+evidence; Greedy Packing is a promising problem-dependent option.
 
 \end{document}

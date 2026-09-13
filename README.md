@@ -23,6 +23,11 @@ across acquisitions, dimensions, synthetic functions, and applied tasks.
 - In the completed 28D YAHPO study, alpha 0.5 significantly improves LogEI and
   GP-TS on `sylvine`, with no significant decay-policy loss. Most other cells
   are tied or inconclusive.
+- Finite-grid Greedy Packing is strongly problem-dependent. It is effective on
+  Rastrigin 10D and 30D and preserves PE gains for several 30D Sparse Hartmann
+  acquisitions. Fresh Rastrigin seeds retain an advantage, but transferring
+  the same schedule to Ackley and Rosenbrock usually does not. Uniform PE is
+  therefore still the more reliable default.
 
 Knowledge Gradient is implemented as an optional acquisition for a planned
 follow-up, but no KG result is included in the findings yet.

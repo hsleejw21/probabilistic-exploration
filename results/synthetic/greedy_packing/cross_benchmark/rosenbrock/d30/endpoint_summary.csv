@@ -1,0 +1,4 @@
+objective,acquisition,beta_mode,policy,n_seeds,mean,median,std
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,5,0.46481739958233065,0.4433162741086882,0.1078689243663829
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,5,0.18639575337051556,0.1548054104659613,0.05643869257768179
+rosenbrock_mean_30d,ucb,constant,standard,5,0.44345092944319103,0.3733894757335701,0.3491194357732044

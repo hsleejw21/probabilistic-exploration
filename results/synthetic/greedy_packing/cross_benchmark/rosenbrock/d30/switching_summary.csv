@@ -1,0 +1,16 @@
+objective,acquisition,beta_mode,policy,seed,dimension,exploration_rule,decay_exponent,bo_steps,actual_pe_calls,expected_pe_calls,realized_pe_fraction,first_pe_round,last_pe_round,mode_transitions
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,0,30,greedy_packing,0.8333333333333334,400,27,35.84750100274302,0.0675,2.0,399.0,50
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,1,30,greedy_packing,0.8333333333333334,400,39,35.84750100274302,0.0975,1.0,398.0,65
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,2,30,greedy_packing,0.8333333333333334,400,41,35.84750100274302,0.1025,1.0,390.0,75
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,3,30,greedy_packing,0.8333333333333334,400,34,35.84750100274302,0.085,1.0,393.0,57
+rosenbrock_mean_30d,ucb,constant,decay_greedy_packing_grid_a5_6,4,30,greedy_packing,0.8333333333333334,400,34,35.84750100274302,0.085,1.0,337.0,59
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,0,30,uniform,0.8333333333333334,400,27,35.84750100274302,0.0675,2.0,399.0,50
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,1,30,uniform,0.8333333333333334,400,39,35.84750100274302,0.0975,1.0,398.0,65
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,2,30,uniform,0.8333333333333334,400,41,35.84750100274302,0.1025,1.0,390.0,75
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,3,30,uniform,0.8333333333333334,400,34,35.84750100274302,0.085,1.0,393.0,57
+rosenbrock_mean_30d,ucb,constant,decay_uniform_grid_a5_6,4,30,uniform,0.8333333333333334,400,34,35.84750100274302,0.085,1.0,337.0,59
+rosenbrock_mean_30d,ucb,constant,standard,0,30,none,,400,0,0.0,0.0,,,0
+rosenbrock_mean_30d,ucb,constant,standard,1,30,none,,400,0,0.0,0.0,,,0
+rosenbrock_mean_30d,ucb,constant,standard,2,30,none,,400,0,0.0,0.0,,,0
+rosenbrock_mean_30d,ucb,constant,standard,3,30,none,,400,0,0.0,0.0,,,0
+rosenbrock_mean_30d,ucb,constant,standard,4,30,none,,400,0,0.0,0.0,,,0
