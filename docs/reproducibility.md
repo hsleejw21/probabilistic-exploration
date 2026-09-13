@@ -3,6 +3,10 @@
 Install the core package with `pip install -e .`. Add `[lunar]`, `[yahpo]`, or
 `[test]` for the corresponding optional dependencies.
 
+The YAHPO extra pins NumPy 1.26.4 for compatibility with the released
+`yahpo-gym` stack and to match the recorded YAHPO runs. Core and Lunar runs are
+also tested with NumPy 2.4.2.
+
 Every runner writes one file per trial and safely resumes completed trials.
 Use a separate output directory whenever the protocol changes. The public
 results contain metadata, audits, and aggregate CSV files; large per-iteration
