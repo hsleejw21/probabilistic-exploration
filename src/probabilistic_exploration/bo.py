@@ -18,7 +18,12 @@ from .acquisitions import (
 )
 from .benchmarks import BENCHMARKS, Benchmark
 from .config import ExperimentConfig
-from .exploration import decay_exponent, exploration_probability, exploration_rule
+from .exploration import (
+    GreedyPackingExplorer,
+    decay_exponent,
+    exploration_probability,
+    exploration_rule,
+)
 from .gp_surrogate import build_gaussian_process
 
 
@@ -131,11 +136,22 @@ def run_trial(spec: TrialSpec, config: ExperimentConfig) -> list[dict[str, objec
     acquisition_rng = np.random.default_rng(streams[4])
     recommendation_rng = np.random.default_rng(streams[5])
     diagnostic_seed = _stream_seed(streams[6])
+    greedy_packing_seed = _stream_seed(streams[7])
 
     initial_design = sobol_points(config.n_initial, benchmark.dim, initial_seed)
     diagnostic_design = sobol_points(
         config.variance_candidates, benchmark.dim, diagnostic_seed
     )
+    greedy_packing = None
+    if exploration_rule(spec.policy) == "greedy_packing":
+        greedy_packing = GreedyPackingExplorer(
+            dim=benchmark.dim,
+            seed=greedy_packing_seed,
+            max_iteration=total_evaluations - config.n_initial,
+            grid_initial=config.greedy_packing_grid_initial,
+            grid_growth=config.greedy_packing_grid_growth,
+            distance_batch_size=config.greedy_packing_distance_batch_size,
+        )
 
     gp = build_gaussian_process(
         config,
@@ -306,11 +322,16 @@ def run_trial(spec: TrialSpec, config: ExperimentConfig) -> list[dict[str, objec
         )
         started = time.perf_counter()
         if decision_rng.random() < p_explore:
-            if exploration_rule(spec.policy) == "mvr":
+            rule = exploration_rule(spec.policy)
+            if rule == "mvr":
                 unit_x = maximize_posterior_variance(
                     gp, benchmark.dim, exploration_rng, config, restarts=20
                 )
                 event = "mvr_exploration"
+            elif rule == "greedy_packing":
+                assert greedy_packing is not None
+                unit_x = greedy_packing.select(bo_t, np.vstack(x_observed))
+                event = "greedy_packing_exploration"
             else:
                 unit_x = exploration_rng.random(benchmark.dim)
                 event = "uniform_exploration"

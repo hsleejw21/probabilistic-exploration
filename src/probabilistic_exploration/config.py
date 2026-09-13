@@ -10,7 +10,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
-from .exploration import DIMENSION_ALPHA_POLICIES, FEEDBACK_POLICIES
+from .exploration import (
+    DIMENSION_ALPHA_POLICIES,
+    FEEDBACK_POLICIES,
+    GREEDY_PACKING_POLICIES,
+)
 
 
 # [PAPER] Figure-to-method mapping.
@@ -40,6 +44,9 @@ AVAILABLE_POLICIES = tuple(dict.fromkeys(AVAILABLE_POLICIES + FEEDBACK_POLICIES)
 AVAILABLE_POLICIES = tuple(
     dict.fromkeys(AVAILABLE_POLICIES + DIMENSION_ALPHA_POLICIES)
 )
+AVAILABLE_POLICIES = tuple(
+    dict.fromkeys(AVAILABLE_POLICIES + GREEDY_PACKING_POLICIES)
+)
 POLICY_LABELS = {
     "standard": "Standard",
     "fixed_p010": "Fixed $p=0.1$",
@@ -68,6 +75,16 @@ for _rule, _label in (("uniform", "Uniform"), ("mvr", "MVR")):
         POLICY_LABELS[f"decay_{_rule}_grid_a{_slug}"] = (
             rf"Decay {_label} ($\alpha={_alpha}$)"
         )
+
+for _slug, _alpha in (
+    ("1_2", "1/2"),
+    ("2_3", "2/3"),
+    ("5_6", "5/6"),
+    ("1", "1"),
+):
+    POLICY_LABELS[f"decay_greedy_packing_grid_a{_slug}"] = (
+        rf"Decay Greedy Packing ($\alpha={_alpha}$)"
+    )
 
 
 @dataclass(frozen=True)
@@ -115,6 +132,12 @@ class ExperimentConfig:
     # not invalidate cached results from the existing discretized GP-TS.
     ts_rff_features: int = 1000            # Do et al. (2024) reference scale
     variance_candidates: int = 512        # diagnostic only
+
+    # Finite-grid Greedy Packing on PE rounds. The nested scrambled-Sobol grid
+    # has N_t = initial + ceil(growth * t) candidates at BO step t.
+    greedy_packing_grid_initial: int = 256
+    greedy_packing_grid_growth: float = 16.0
+    greedy_packing_distance_batch_size: int = 2048
 
     # MES-G approximation. These settings are acquisition-specific and are
     # tracked separately from the common BO-protocol hash.

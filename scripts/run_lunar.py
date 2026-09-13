@@ -83,6 +83,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ts-candidate-growth-scale", type=float, default=None)
     parser.add_argument("--ts-candidate-max", type=int, default=None)
     parser.add_argument("--logarithmic-beta-scale", type=float, default=None)
+    parser.add_argument("--greedy-packing-grid-initial", type=int, default=None)
+    parser.add_argument("--greedy-packing-grid-growth", type=float, default=None)
+    parser.add_argument(
+        "--greedy-packing-distance-batch-size", type=int, default=None
+    )
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=None)
@@ -115,6 +120,12 @@ def _build_config(args: argparse.Namespace):
         (args.ts_candidate_growth_scale, "ts_candidate_growth_scale"),
         (args.ts_candidate_max, "ts_candidate_max"),
         (args.logarithmic_beta_scale, "logarithmic_beta_scale"),
+        (args.greedy_packing_grid_initial, "greedy_packing_grid_initial"),
+        (args.greedy_packing_grid_growth, "greedy_packing_grid_growth"),
+        (
+            args.greedy_packing_distance_batch_size,
+            "greedy_packing_distance_batch_size",
+        ),
     ):
         if argument is not None:
             updates[field] = argument
@@ -248,7 +259,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     trials_dir.mkdir(parents=True, exist_ok=True)
 
     selected_acquisitions = sorted(set(args.acquisitions))
-    common_digest = config_hash(config)
+    common_digest = config_hash(config, args.policies)
     acquisition_digest = acquisition_config_hash(config, selected_acquisitions)
     lunar_payload = {
         "settings": settings.metadata(),

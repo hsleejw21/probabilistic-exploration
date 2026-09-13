@@ -33,7 +33,12 @@ from probabilistic_exploration.acquisitions import (
 )
 from probabilistic_exploration.bo import should_optimize_hyperparameters
 from probabilistic_exploration.config import AVAILABLE_POLICIES, POLICIES, high_dimensional_config
-from probabilistic_exploration.exploration import decay_exponent, exploration_probability, exploration_rule
+from probabilistic_exploration.exploration import (
+    GreedyPackingExplorer,
+    decay_exponent,
+    exploration_probability,
+    exploration_rule,
+)
 from probabilistic_exploration.gp_surrogate import build_gaussian_process
 from probabilistic_exploration.yahpo_benchmarks import YAHPO_TASKS, empirical_target_range, objective_loss
 
@@ -69,7 +74,13 @@ class TrialSpec:
         )
 
 
-def application_config(dimension: int, budget: int):
+def application_config(
+    dimension: int,
+    budget: int,
+    greedy_packing_grid_initial: int = 256,
+    greedy_packing_grid_growth: float = 16.0,
+    greedy_packing_distance_batch_size: int = 2048,
+):
     return replace(
         high_dimensional_config(),
         budget_override=budget,
@@ -88,6 +99,9 @@ def application_config(dimension: int, budget: int):
         ts_candidate_growth_scale=64.0,
         ts_candidate_max=512,
         logarithmic_beta_scale=1.0,
+        greedy_packing_grid_initial=greedy_packing_grid_initial,
+        greedy_packing_grid_growth=greedy_packing_grid_growth,
+        greedy_packing_distance_batch_size=greedy_packing_distance_batch_size,
     )
 
 
@@ -95,15 +109,27 @@ def _stream_seed(sequence: np.random.SeedSequence) -> int:
     return int(sequence.generate_state(1, dtype=np.uint32)[0])
 
 
-def run_trial(spec: TrialSpec, budget: int) -> list[dict[str, object]]:
+def run_trial(
+    spec: TrialSpec,
+    budget: int,
+    greedy_packing_grid_initial: int = 256,
+    greedy_packing_grid_growth: float = 16.0,
+    greedy_packing_distance_batch_size: int = 2048,
+) -> list[dict[str, object]]:
     task = YAHPO_TASKS[spec.task]
-    config = application_config(task.dim, budget)
+    config = application_config(
+        task.dim,
+        budget,
+        greedy_packing_grid_initial,
+        greedy_packing_grid_growth,
+        greedy_packing_distance_batch_size,
+    )
     if config.n_initial >= budget:
         raise ValueError(
             f"budget {budget} must exceed n_initial={config.n_initial}"
         )
 
-    streams = np.random.SeedSequence(spec.seed).spawn(5)
+    streams = np.random.SeedSequence(spec.seed).spawn(6)
     initial_design = sobol_points(
         config.n_initial, task.dim, _stream_seed(streams[0])
     )
@@ -112,6 +138,14 @@ def run_trial(spec: TrialSpec, budget: int) -> list[dict[str, object]]:
     acquisition_rng = np.random.default_rng(streams[3])
     diagnostic_design = sobol_points(
         config.variance_candidates, task.dim, _stream_seed(streams[4])
+    )
+    greedy_packing = GreedyPackingExplorer(
+        dim=task.dim,
+        seed=_stream_seed(streams[5]),
+        max_iteration=budget - config.n_initial,
+        grid_initial=config.greedy_packing_grid_initial,
+        grid_growth=config.greedy_packing_grid_growth,
+        distance_batch_size=config.greedy_packing_distance_batch_size,
     )
     reference_min, reference_max = empirical_target_range(task)
 
@@ -212,11 +246,17 @@ def run_trial(spec: TrialSpec, budget: int) -> list[dict[str, object]]:
         beta = beta_value(spec.beta_mode, bo_iteration, config)
         started = time.perf_counter()
         if decision_rng.random() < probability:
-            if exploration_rule(spec.policy) == "mvr":
+            rule = exploration_rule(spec.policy)
+            if rule == "mvr":
                 point = maximize_posterior_variance(
                     gp, task.dim, exploration_rng, config, restarts=20
                 )
                 event = "mvr_exploration"
+            elif rule == "greedy_packing":
+                point = greedy_packing.select(
+                    bo_iteration, np.vstack(x_observed)
+                )
+                event = "greedy_packing_exploration"
             else:
                 point = exploration_rng.random(task.dim)
                 event = "uniform_exploration"
@@ -403,6 +443,11 @@ def build_parser():
     parser.add_argument("--num-seeds", type=int, default=3)
     parser.add_argument("--seed-start", type=int, default=0)
     parser.add_argument("--budget", type=int, default=100)
+    parser.add_argument("--greedy-packing-grid-initial", type=int, default=256)
+    parser.add_argument("--greedy-packing-grid-growth", type=float, default=16.0)
+    parser.add_argument(
+        "--greedy-packing-distance-batch-size", type=int, default=2048
+    )
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser
@@ -419,6 +464,12 @@ def main() -> int:
     )
     if any(unknown):
         raise ValueError(f"unknown tasks/acquisitions/policies: {unknown}")
+    if (
+        args.greedy_packing_grid_initial < 1
+        or args.greedy_packing_grid_growth <= 0.0
+        or args.greedy_packing_distance_batch_size < 1
+    ):
+        raise ValueError("invalid Greedy Packing grid settings")
 
     acquisition_modes = []
     for acquisition in args.acquisitions:
@@ -459,7 +510,15 @@ def main() -> int:
         "gp_config_by_dimension": {
             str(dim): {
                 key: value
-                for key, value in asdict(application_config(dim, args.budget)).items()
+                for key, value in asdict(
+                    application_config(
+                        dim,
+                        args.budget,
+                        args.greedy_packing_grid_initial,
+                        args.greedy_packing_grid_growth,
+                        args.greedy_packing_distance_batch_size,
+                    )
+                ).items()
                 if "kg" in args.acquisitions or not key.startswith("kg_")
             }
             for dim in sorted({YAHPO_TASKS[name].dim for name in tasks})
@@ -501,12 +560,31 @@ def main() -> int:
     completed = 0
     if args.jobs == 1:
         for spec in pending:
-            _atomic_csv(trials_dir / f"{spec.slug()}.csv", run_trial(spec, args.budget))
+            _atomic_csv(
+                trials_dir / f"{spec.slug()}.csv",
+                run_trial(
+                    spec,
+                    args.budget,
+                    args.greedy_packing_grid_initial,
+                    args.greedy_packing_grid_growth,
+                    args.greedy_packing_distance_batch_size,
+                ),
+            )
             completed += 1
             print(f"[{completed}/{len(pending)}] completed {spec}", flush=True)
     else:
         with ProcessPoolExecutor(max_workers=args.jobs) as executor:
-            futures = {executor.submit(run_trial, spec, args.budget): spec for spec in pending}
+            futures = {
+                executor.submit(
+                    run_trial,
+                    spec,
+                    args.budget,
+                    args.greedy_packing_grid_initial,
+                    args.greedy_packing_grid_growth,
+                    args.greedy_packing_distance_batch_size,
+                ): spec
+                for spec in pending
+            }
             for future in as_completed(futures):
                 spec = futures[future]
                 _atomic_csv(trials_dir / f"{spec.slug()}.csv", future.result())

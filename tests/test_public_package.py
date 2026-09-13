@@ -12,6 +12,7 @@ from probabilistic_exploration.acquisitions import (
 )
 from probabilistic_exploration.config import paper_config
 from probabilistic_exploration.exploration import (
+    GreedyPackingExplorer,
     exploration_probability,
     exploration_rule,
 )
@@ -35,6 +36,40 @@ def test_decay_probability_decreases_and_alpha_controls_strength():
 def test_standard_never_explores():
     assert exploration_probability("standard", 30, 1) == 0.0
     assert exploration_rule("standard") == "none"
+
+
+def test_greedy_packing_uses_the_same_decay_schedule_as_uniform():
+    for suffix in ("a1_2", "a2_3", "a1"):
+        greedy = f"decay_greedy_packing_grid_{suffix}"
+        uniform = f"decay_uniform_grid_{suffix}"
+        assert exploration_rule(greedy) == "greedy_packing"
+        for iteration in (1, 7, 50):
+            assert math.isclose(
+                exploration_probability(greedy, 30, iteration),
+                exploration_probability(uniform, 30, iteration),
+            )
+
+
+def test_greedy_packing_grid_grows_linearly_and_selects_farthest_point():
+    explorer = GreedyPackingExplorer(
+        dim=2,
+        seed=9,
+        max_iteration=5,
+        grid_initial=8,
+        grid_growth=4,
+        distance_batch_size=3,
+    )
+    assert explorer.grid_size(1) == 12
+    assert explorer.grid_size(5) == 28
+
+    references = np.asarray([[0.5, 0.5]])
+    selected = explorer.select(1, references)
+    active = explorer._candidates[: explorer.grid_size(1)]
+    distances = np.min(
+        np.linalg.norm(active[:, None, :] - references[None, :, :], axis=2),
+        axis=1,
+    )
+    assert np.allclose(selected, active[np.argmax(distances)])
 
 
 def test_shared_gp_protocol_fixes_unit_signal_variance():

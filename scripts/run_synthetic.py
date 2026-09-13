@@ -144,6 +144,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ts-candidate-growth-scale", type=float, default=None)
     parser.add_argument("--ts-candidate-max", type=int, default=None)
     parser.add_argument("--variance-candidates", type=int, default=None)
+    parser.add_argument("--greedy-packing-grid-initial", type=int, default=None)
+    parser.add_argument("--greedy-packing-grid-growth", type=float, default=None)
+    parser.add_argument(
+        "--greedy-packing-distance-batch-size", type=int, default=None
+    )
     parser.add_argument("--mes-num-max-samples", type=int, default=None)
     parser.add_argument("--mes-num-representer-points", type=int, default=None)
     parser.add_argument(
@@ -211,6 +216,9 @@ def resolve_config(args: argparse.Namespace) -> tuple[ExperimentConfig, int]:
         "ts_candidate_growth_scale": "ts_candidate_growth_scale",
         "ts_candidate_max": "ts_candidate_max",
         "variance_candidates": "variance_candidates",
+        "greedy_packing_grid_initial": "greedy_packing_grid_initial",
+        "greedy_packing_grid_growth": "greedy_packing_grid_growth",
+        "greedy_packing_distance_batch_size": "greedy_packing_distance_batch_size",
         "mes_num_max_samples": "mes_num_max_samples",
         "mes_num_representer_points": "mes_num_representer_points",
         "mes_representer_design": "mes_representer_design",
@@ -262,6 +270,12 @@ def resolve_config(args: argparse.Namespace) -> tuple[ExperimentConfig, int]:
         or config.ts_candidate_growth_scale <= 0.0
     ):
         raise ValueError("invalid TS candidate schedule")
+    if (
+        config.greedy_packing_grid_initial < 1
+        or config.greedy_packing_grid_growth <= 0.0
+        or config.greedy_packing_distance_batch_size < 1
+    ):
+        raise ValueError("invalid Greedy Packing grid settings")
     for name, bounds in (
         ("lengthscale_bounds", config.lengthscale_bounds),
         ("signal_variance_bounds", config.signal_variance_bounds),
@@ -383,7 +397,9 @@ def build_specs(
     ]
 
 
-def config_hash(config: ExperimentConfig) -> str:
+def config_hash(
+    config: ExperimentConfig, policies: Sequence[str] | None = None
+) -> str:
     # Acquisition-specific settings have their own hash. Excluding them here
     # preserves the hashes of the completed UCB/TS and EI/LogEI artifacts.
     common = {
@@ -392,6 +408,12 @@ def config_hash(config: ExperimentConfig) -> str:
         if not name.startswith("mes_")
         and not name.startswith("kg_")
         and not name.startswith("ts_rff_")
+        and not (
+            name.startswith("greedy_packing_")
+            and not any(
+                "_greedy_packing_" in policy for policy in (policies or ())
+            )
+        )
         and name
         not in {
             "ts_candidate_schedule",
@@ -720,7 +742,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     trials_dir = output_dir / "trials"
     trials_dir.mkdir(parents=True, exist_ok=True)
 
-    digest = config_hash(config)
+    digest = config_hash(config, sorted({spec.policy for spec in specs}))
     acquisition_digest = acquisition_config_hash(config, selected_acquisitions)
     metadata_path = output_dir / "metadata.json"
     if metadata_path.exists():
