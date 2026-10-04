@@ -47,7 +47,10 @@ POLICY_COLORS = {
     "decay_mvr_a1": "#7A4E9D",
     "decay_mvr_a4_3": "#222222",
     "decay_greedy_packing_grid_a1_2": "#53A67A",
+    "decay_greedy_packing_grid_a1_4": "#22A779",
+    "decay_greedy_packing_grid_a1_3": "#1C966B",
     "decay_greedy_packing_grid_a2_3": "#16845B",
+    "decay_greedy_packing_grid_a3_4": "#137A53",
     "decay_greedy_packing_grid_a5_6": "#0F6F4B",
     "decay_greedy_packing_grid_a1": "#0C5B3C",
 }
@@ -71,7 +74,10 @@ POLICY_LABELS = {
     "decay_uniform_grid_a4_3": r"Decay $\alpha=4/3$",
     "decay_uniform_grid_a3_2": r"Decay $\alpha=3/2$",
     "decay_greedy_packing_grid_a1_2": r"Greedy Packing $\alpha=1/2$",
+    "decay_greedy_packing_grid_a1_4": r"Greedy Packing $\alpha=1/4$",
+    "decay_greedy_packing_grid_a1_3": r"Greedy Packing $\alpha=1/3$",
     "decay_greedy_packing_grid_a2_3": r"Greedy Packing $\alpha=2/3$",
+    "decay_greedy_packing_grid_a3_4": r"Greedy Packing $\alpha=3/4$",
     "decay_greedy_packing_grid_a5_6": r"Greedy Packing $\alpha=5/6$",
     "decay_greedy_packing_grid_a1": r"Greedy Packing $\alpha=1$",
 }

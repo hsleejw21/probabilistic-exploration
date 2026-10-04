@@ -11,6 +11,7 @@ from probabilistic_exploration.acquisitions import (
     discrete_knowledge_gradient,
 )
 from probabilistic_exploration.config import paper_config
+from probabilistic_exploration.benchmarks import BENCHMARKS
 from probabilistic_exploration.exploration import (
     GreedyPackingExplorer,
     exploration_probability,
@@ -39,7 +40,7 @@ def test_standard_never_explores():
 
 
 def test_greedy_packing_uses_the_same_decay_schedule_as_uniform():
-    for suffix in ("a1_2", "a2_3", "a1"):
+    for suffix in ("a1_4", "a1_3", "a1_2", "a2_3", "a3_4"):
         greedy = f"decay_greedy_packing_grid_{suffix}"
         uniform = f"decay_uniform_grid_{suffix}"
         assert exploration_rule(greedy) == "greedy_packing"
@@ -48,6 +49,23 @@ def test_greedy_packing_uses_the_same_decay_schedule_as_uniform():
                 exploration_probability(greedy, 30, iteration),
                 exploration_probability(uniform, 30, iteration),
             )
+
+
+def test_current_synthetic_benchmarks_and_alpha_grid_are_registered():
+    objectives = {
+        "hartmann6_active_6d",
+        "griewank_mean_shifted_10d",
+        "trid_normalized_10d",
+        "rosenbrock_mean_20d",
+        "bent_cigar_shifted_30d",
+        "sphere_mean_shifted_30d",
+        "griewank_mean_shifted_30d",
+        "sum_powers_normalized_30d",
+    }
+    assert objectives <= set(BENCHMARKS)
+    for suffix in ("a1_4", "a1_3", "a1_2", "a2_3", "a3_4"):
+        assert exploration_rule(f"decay_uniform_grid_{suffix}") == "uniform"
+        assert exploration_rule(f"decay_greedy_packing_grid_{suffix}") == "greedy_packing"
 
 
 def test_greedy_packing_grid_grows_linearly_and_selects_farthest_point():
@@ -151,6 +169,38 @@ def test_greedy_application_results_are_complete_and_audited():
     synthetic = root / "synthetic" / "greedy_packing" / "grid4x_confirmation"
     with (synthetic / "summary.csv").open(newline="") as handle:
         assert len(list(csv.DictReader(handle))) == 18
+
+
+def test_current_synthetic_release_is_complete():
+    directory = (
+        Path(__file__).resolve().parents[1]
+        / "results"
+        / "synthetic"
+        / "eight_benchmark_alpha_sweep"
+    )
+    protocol = json.loads((directory / "protocol.json").read_text())
+    assert len(protocol["objectives"]) == 8
+    assert protocol["num_paired_runs"] == 20
+    assert protocol["bo_evaluations"] == 400
+
+    with (directory / "selected_uniform_endpoints.csv").open(newline="") as handle:
+        endpoints = list(csv.DictReader(handle))
+    assert len(endpoints) == 24
+    assert sum(float(row["mean_gain"]) > 0 for row in endpoints) == 23
+    assert sum(
+        float(row["gain_ci_low"]) > 0 or float(row["gain_ci_high"]) < 0
+        for row in endpoints
+    ) == 21
+
+    with (directory / "alpha_sweep_summary.csv").open(newline="") as handle:
+        sweep = list(csv.DictReader(handle))
+    assert len(sweep) == 8 * 3 * 2 * 5
+    assert {row["n_seeds"] for row in sweep} == {"20"}
+
+    with (directory / "trajectory_summary.csv").open(newline="") as handle:
+        trajectories = list(csv.DictReader(handle))
+    assert len(trajectories) == 8 * 3 * 2 * 400
+    assert {row["n_seeds"] for row in trajectories} == {"20"}
 
 
 def test_public_text_artifacts_do_not_contain_server_paths():

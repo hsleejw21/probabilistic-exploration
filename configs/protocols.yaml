@@ -1,10 +1,12 @@
+current_paper_protocol: configs/aistats2027.yaml
+
 common:
   kernel: matern
   signal_variance: 1.0
   learn_signal_variance: false
   paired_initial_design: true
 
-synthetic_30d:
+synthetic_30d_legacy_snapshot:
   budget: 500
   n_initial: 2
   heldout_seeds: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]

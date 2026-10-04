@@ -1,18 +1,59 @@
 {
   "title": "Probabilistic Exploration for Efficient Bayesian Optimization",
-  "as_of": "2026-09-14",
+  "as_of": "2026-10-03",
   "sign_convention": "positive favors the first method named; Greedy Packing figures show Uniform over Standard, Greedy over Standard, and Greedy over Uniform",
   "included": [
-    {"id": "synthetic_acquisition_30d", "status": "complete", "gp_ts": "logarithmic beta and growing fresh Sobol candidates"},
-    {"id": "synthetic_dimension_alpha", "status": "complete"},
-    {"id": "synthetic_practical_alpha", "status": "exploratory"},
-    {"id": "lunar_12d", "status": "complete"},
-    {"id": "sklearn_hpo", "status": "complete"},
-    {"id": "yahpo_highdim_hpo", "status": "complete"},
-    {"id": "synthetic_greedy_packing", "status": "complete", "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"},
-    {"id": "yahpo_greedy_packing", "status": "complete", "scope": "14D and 28D; default grid on 30 seeds; fourfold grid on 15 fresh seeds"},
-    {"id": "lunar_greedy_packing", "status": "complete", "scope": "LogEI; 30 paired controllers; 200 held-out terrains per controller"},
-    {"id": "greedy_grid_robustness", "status": "complete", "scope": "default, twofold, and fourfold finite-grid checks across synthetic, YAHPO, and Lunar studies"}
+    {
+      "id": "synthetic_eight_benchmark_alpha_sweep",
+      "status": "complete",
+      "scope": "8 objectives; GP-UCB, LogEI, and GP-TS; Standard plus five Uniform and five Greedy Packing schedules; 20 paired runs",
+      "paper_snapshot": true
+    },
+    {
+      "id": "synthetic_acquisition_30d",
+      "status": "complete",
+      "gp_ts": "logarithmic beta and growing fresh Sobol candidates"
+    },
+    {
+      "id": "synthetic_dimension_alpha",
+      "status": "complete"
+    },
+    {
+      "id": "synthetic_practical_alpha",
+      "status": "exploratory"
+    },
+    {
+      "id": "lunar_12d",
+      "status": "complete"
+    },
+    {
+      "id": "sklearn_hpo",
+      "status": "complete"
+    },
+    {
+      "id": "yahpo_highdim_hpo",
+      "status": "complete"
+    },
+    {
+      "id": "synthetic_greedy_packing",
+      "status": "complete",
+      "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"
+    },
+    {
+      "id": "yahpo_greedy_packing",
+      "status": "complete",
+      "scope": "14D and 28D; default grid on 30 seeds; fourfold grid on 15 fresh seeds"
+    },
+    {
+      "id": "lunar_greedy_packing",
+      "status": "complete",
+      "scope": "LogEI; 30 paired controllers; 200 held-out terrains per controller"
+    },
+    {
+      "id": "greedy_grid_robustness",
+      "status": "complete",
+      "scope": "default, twofold, and fourfold finite-grid checks across synthetic, YAHPO, and Lunar studies"
+    }
   ],
   "excluded": [
     "quota and qplus methods",
@@ -21,5 +62,10 @@
     "stopped optional 1000-evaluation 30D GP-TS run",
     "separately supplied professor-code comparison",
     "preliminary Greedy Packing setting sweeps"
+  ],
+  "notes": [
+    "The current paper-facing synthetic snapshot uses 20 paired runs.",
+    "A separate 10-seed extension was still in progress when this snapshot was prepared and is not included.",
+    "Earlier completed studies remain in the release for provenance."
   ]
 }

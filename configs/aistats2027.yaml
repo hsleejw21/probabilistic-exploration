@@ -1,0 +1,91 @@
+synthetic:
+  status: paper_snapshot_20_seeds
+  objectives:
+    - hartmann6_active_6d
+    - griewank_mean_shifted_10d
+    - trid_normalized_10d
+    - rosenbrock_mean_20d
+    - bent_cigar_shifted_30d
+    - sphere_mean_shifted_30d
+    - griewank_mean_shifted_30d
+    - sum_powers_normalized_30d
+  acquisitions:
+    ucb: {beta_mode: constant, beta: 2.0}
+    logei: {beta_mode: native}
+    ts:
+      beta_mode: logarithmic
+      covariance_multiplier: "log(t + 1)"
+      candidate_schedule: "clip(ceil(64 * sqrt(t)), 128, 512)"
+  policies:
+    - standard
+    - decay_uniform_grid_a1_4
+    - decay_uniform_grid_a1_3
+    - decay_uniform_grid_a1_2
+    - decay_uniform_grid_a2_3
+    - decay_uniform_grid_a3_4
+    - decay_greedy_packing_grid_a1_4
+    - decay_greedy_packing_grid_a1_3
+    - decay_greedy_packing_grid_a1_2
+    - decay_greedy_packing_grid_a2_3
+    - decay_greedy_packing_grid_a3_4
+  schedule: "min(1, log(t + 1) / (t + 1)^alpha)"
+  budget:
+    initial_scrambled_sobol: 2
+    bo_evaluations: 400
+    total_evaluations: 402
+  repetitions: 20
+  paired_within: [objective, acquisition, seed]
+  metric: final_inference_regret_at_posterior_mean_recommendation
+  model:
+    kernel: matern_3_2
+    gp_input_space: unit_cube
+    center_targets: true
+    signal_variance: 1.0
+    learn_signal_variance: false
+    observation_noise_variance: 0.01
+    gp_nugget_variance: 0.01
+    initial_lengthscale: 0.5
+    lengthscale_bounds: [0.01, 20.0]
+    refit_interval: 5
+    sklearn_optimizer_restarts: 2
+  optimization:
+    acquisition_restarts: 20
+    recommendation_restarts: 20
+    recommendation_includes_observed_inputs: true
+    restart_design: sobol
+  greedy_packing:
+    candidate_design: nested_scrambled_sobol
+    candidate_count: "256 + ceil(16 * t)"
+
+yahpo:
+  package: yahpo-gym==1.0.2
+  numpy: 1.26.4
+  repetitions: 30
+  initial_design: 10
+  xgboost_14d:
+    tasks: [credit-g, car, blood-transfusion-service-center]
+    total_evaluations: 120
+  joint_tuning_28d:
+    instances: [40981, 41146]
+    total_evaluations: 200
+
+lunar:
+  source: TuRBO Lunar Lander controller-tuning benchmark
+  dimension: 12
+  repetitions: 30
+  initial_design: 24
+  total_evaluations: 400
+  terrains_per_evaluation: 50
+  heldout_terrains_per_controller: 200
+  package: gymnasium[box2d]==1.3.0
+
+environment:
+  python: "3.12"
+  numpy: ">=1.26.4,<3"
+  scipy: "1.17.1"
+  scikit_learn: "1.9.0"
+  pandas: "3.0.0"
+  matplotlib: "3.10.8"
+  parallelism:
+    trial_workers: 12
+    blas_threads_per_worker: 1

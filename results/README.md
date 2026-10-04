@@ -2,19 +2,22 @@
 
 | Study | Status | Purpose | Public contents |
 |---|---|---|---|
-| 30D acquisition generalization | Complete | Test PE across UCB, LogEI, MES-Gumbel, and theory-aligned GP-TS | aggregate CSV, audit, figures |
-| Dimension–alpha panels | Complete | Test whether the useful decay rate changes with dimension and benchmark | figures and report tables |
-| Practical alpha selection | Exploratory | Evaluate simple data-driven alpha selection on fresh seeds | figures and report tables |
-| Lunar Lander 12D | Complete | Test transfer to simulation-based controller tuning | figures and report tables |
-| scikit-learn HPO | Complete | Test transfer to real-data model tuning | metadata, audit, summary |
-| YAHPO high-dimensional HPO | Complete | Test transfer to 14D and 28D HPO surrogates | aggregate CSVs, audits, figures, and full protocol |
-| Synthetic Greedy Packing | Complete | Compare farthest-point PE with Standard and Uniform PE across 30D acquisitions, Rastrigin dimensions, fresh seeds, and cross-benchmark transfer | aggregate CSVs, audits, figures, and protocol |
-| YAHPO Greedy Packing | Complete | Compare Greedy PE with Standard and Uniform PE in 14D and 28D HPO | aggregate CSVs, audits, figures, and protocols |
-| Lunar Greedy Packing | Complete | Compare Greedy PE with Standard and Uniform PE on held-out terrains | aggregate CSVs, audit, figure, and protocol |
-| Larger-grid confirmation | Complete | Check whether twofold and fourfold finite grids change the Greedy conclusion | fresh-seed synthetic, YAHPO, and Lunar summaries |
+| Eight-benchmark synthetic alpha sweep | Complete, 20-seed paper snapshot | Compare Standard and Uniform across three acquisitions; report Uniform and Greedy Packing schedule sensitivity | aggregate trajectories, endpoint CSVs, protocol, figures |
+| YAHPO high-dimensional HPO | Complete | Test PE on 14D XGBoost and 28D joint-tuning surrogate tasks | aggregate CSVs, audits, figures, protocol |
+| Lunar Lander 12D | Complete | Test controller tuning and held-out terrain generalization | aggregate CSVs, audits, figures, protocol |
+| 30D acquisition generalization | Earlier completed snapshot | Test PE across UCB, LogEI, MES-Gumbel, and GP-TS | aggregate CSVs, audit, figures |
+| Dimension-alpha panels | Earlier completed snapshot | Study the decay rate across dimension and benchmark | figures and aggregate tables |
+| Practical alpha selection | Exploratory | Evaluate pilot-based alpha selection on fresh seeds | figures and aggregate tables |
+| Synthetic Greedy Packing | Earlier completed snapshot | Compare farthest-point PE with Standard and Uniform across 30D and transfer settings | aggregate CSVs, audits, figures, protocol |
+| scikit-learn HPO | Earlier completed snapshot | Small real-data HPO transfer study | metadata, audit, summary |
 
-Positive differences favor the method named before “over” in each figure. The
-Greedy Packing figures show Uniform over Standard, Greedy over Standard, and
-Greedy over Uniform together. Raw trial histories and preliminary Greedy
-setting sweeps are intentionally omitted; each included completed study retains
-its final protocol, aggregate outputs, and audit record.
+The current paper-facing synthetic release is
+`synthetic/eight_benchmark_alpha_sweep`. Its selected schedule is chosen and
+evaluated on the same 20 paired runs, so the comparison is descriptive rather
+than held out. Positive `mean_gain` in its endpoint table means Standard regret
+minus Uniform regret and therefore favors Uniform.
+
+Raw trial histories and preliminary screens are intentionally omitted. Each
+included completed study retains its protocol and aggregate outputs; studies
+from earlier research stages remain available for provenance but should not be
+confused with the current eight-benchmark protocol.

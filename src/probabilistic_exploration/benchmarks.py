@@ -176,6 +176,79 @@ def _schaffers_f7_reward(x: Array) -> Array:
     return -np.mean(terms, axis=1) ** 2
 
 
+def _normalized_dixon_price_reward(x: Array) -> Array:
+    """Dixon--Price reward scaled by its uniform-domain mean loss."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    if values.shape[1] < 2:
+        raise ValueError("Dixon--Price requires at least two dimensions")
+    indices = np.arange(2, values.shape[1] + 1, dtype=float)
+    loss = (values[:, 0] - 1.0) ** 2
+    loss += np.sum(
+        indices[None, :]
+        * (2.0 * values[:, 1:] ** 2 - values[:, :-1]) ** 2,
+        axis=1,
+    )
+    # For independent U[-10,10] coordinates, this is the exact mean loss.
+    expected = 103.0 / 3.0 + (24100.0 / 3.0) * np.sum(indices)
+    return -loss / expected
+
+
+def _normalized_powell_reward(x: Array) -> Array:
+    """Powell singular reward averaged and scaled over four-variable blocks."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    if values.shape[1] % 4 != 0:
+        raise ValueError("Powell requires a dimension divisible by four")
+    blocks = values.reshape(len(values), -1, 4)
+    x1, x2, x3, x4 = (blocks[:, :, index] for index in range(4))
+    loss = (x1 + 10.0 * x2) ** 2
+    loss += 5.0 * (x3 - x4) ** 2
+    loss += (x2 - 2.0 * x3) ** 4
+    loss += 10.0 * (x1 - x4) ** 4
+    return -np.mean(loss, axis=1) / 5000.0
+
+
+def _normalized_zakharov_reward(x: Array) -> Array:
+    """Zakharov reward scaled to remain order one as dimension grows."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    indices = np.arange(1, values.shape[1] + 1, dtype=float)
+    linear = np.sum(0.5 * indices[None, :] * values, axis=1)
+    loss = np.sum(values**2, axis=1) + linear**2 + linear**4
+    # The native domain is [-5,10]. Its nonzero mean makes the fourth-order
+    # term grow rapidly; this reference scale is its value at the domain mean.
+    reference_linear = 1.25 * np.sum(indices)
+    scale = values.shape[1] * 25.0 + reference_linear**2 + reference_linear**4
+    return -loss / scale
+
+
+def _mean_schwefel_reward(x: Array) -> Array:
+    """Dimension-averaged Schwefel reward with optimum zero."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    loss = 418.9828872724338
+    loss -= np.mean(values * np.sin(np.sqrt(np.abs(values))), axis=1)
+    return -loss / 500.0
+
+
+def _normalized_trid_reward(x: Array) -> Array:
+    """Trid reward shifted by the known optimum and dimension normalized."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    dimension = values.shape[1]
+    loss = np.sum((values - 1.0) ** 2, axis=1)
+    loss -= np.sum(values[:, 1:] * values[:, :-1], axis=1)
+    optimum_loss = -dimension * (dimension + 4.0) * (dimension - 1.0) / 6.0
+    # The leading uniform-domain contribution is approximately d^5 / 3.
+    scale = dimension**5 / 3.0
+    return -(loss - optimum_loss) / scale
+
+
+def _normalized_sum_powers_reward(x: Array) -> Array:
+    """Sum of Different Powers reward normalized by its uniform mean."""
+    values = np.atleast_2d(np.asarray(x, dtype=float))
+    exponents = np.arange(2, values.shape[1] + 2, dtype=float)
+    loss = np.sum(np.abs(values) ** exponents[None, :], axis=1)
+    expected = np.sum(1.0 / (exponents + 1.0))
+    return -loss / expected
+
+
 def _additive_ackley5_reward(x: Array) -> Array:
     """Average of independent five-dimensional Ackley blocks."""
     values = np.atleast_2d(x)
@@ -415,6 +488,19 @@ BENCHMARKS.update(
             tuple(float(value) for value in _ACKLEY10_SHIFT),
             0.0,
         ),
+        # Oracle active-subspace control for the Sparse Hartmann diagnostic.
+        # It uses the identical centered Hartmann-6 objective as the 20D/30D
+        # sparse variants, without their inactive coordinates.
+        "hartmann6_active_6d": Benchmark(
+            "hartmann6_active_6d",
+            "Hartmann-6 active subspace (6D)",
+            6,
+            (0.0,) * 6,
+            (1.0,) * 6,
+            _sparse_hartmann6_reward(tuple(range(6))),
+            tuple(float(value) for value in _HARTMANN6_OPTIMUM),
+            0.0,
+        ),
         "hartmann18_additive": Benchmark(
             "hartmann18_additive",
             "Additive Hartmann18",
@@ -452,6 +538,103 @@ FEEDBACK_INTERMEDIATE_BENCHMARKS = (
     "hartmann18_additive",
     "currinexp14_additive",
     "park2_16_additive",
+)
+
+
+# Additional scalable candidates from the SFU Virtual Library of Simulation
+# Experiments. Each reward is centered at zero and scaled so that a random
+# point has order-one regret under the native domain. These candidates are
+# screened separately from the fixed six-objective paper comparison.
+_DIXON_PRICE_DIM = 10
+_DIXON_PRICE_OPTIMUM = tuple(
+    1.0
+    if index == 1
+    else 2.0 ** (-(2.0**index - 2.0) / 2.0**index)
+    for index in range(1, _DIXON_PRICE_DIM + 1)
+)
+_POWELL_DIM = 12
+_ZAKHAROV_DIM = 20
+_SCHWEFEL_DIM = 20
+_SCHWEFEL_OPTIMUM = 420.9687462275036
+_TRID_DIM = 10
+_TRID_OPTIMUM = tuple(
+    float(index * (_TRID_DIM + 1 - index))
+    for index in range(1, _TRID_DIM + 1)
+)
+_SUM_POWERS_DIM = 30
+
+BENCHMARKS.update(
+    {
+        "dixon_price_normalized_10d": Benchmark(
+            "dixon_price_normalized_10d",
+            "Dixon--Price 10D (normalized)",
+            _DIXON_PRICE_DIM,
+            (-10.0,) * _DIXON_PRICE_DIM,
+            (10.0,) * _DIXON_PRICE_DIM,
+            _normalized_dixon_price_reward,
+            _DIXON_PRICE_OPTIMUM,
+            0.0,
+        ),
+        "powell_normalized_12d": Benchmark(
+            "powell_normalized_12d",
+            "Powell 12D (normalized)",
+            _POWELL_DIM,
+            (-4.0,) * _POWELL_DIM,
+            (5.0,) * _POWELL_DIM,
+            _normalized_powell_reward,
+            (0.0,) * _POWELL_DIM,
+            0.0,
+        ),
+        "zakharov_normalized_20d": Benchmark(
+            "zakharov_normalized_20d",
+            "Zakharov 20D (normalized)",
+            _ZAKHAROV_DIM,
+            (-5.0,) * _ZAKHAROV_DIM,
+            (10.0,) * _ZAKHAROV_DIM,
+            _normalized_zakharov_reward,
+            (0.0,) * _ZAKHAROV_DIM,
+            0.0,
+        ),
+        "schwefel_mean_20d": Benchmark(
+            "schwefel_mean_20d",
+            "Schwefel 20D (normalized mean)",
+            _SCHWEFEL_DIM,
+            (-500.0,) * _SCHWEFEL_DIM,
+            (500.0,) * _SCHWEFEL_DIM,
+            _mean_schwefel_reward,
+            (_SCHWEFEL_OPTIMUM,) * _SCHWEFEL_DIM,
+            0.0,
+        ),
+        "trid_normalized_10d": Benchmark(
+            "trid_normalized_10d",
+            "Trid 10D (normalized)",
+            _TRID_DIM,
+            (-float(_TRID_DIM**2),) * _TRID_DIM,
+            (float(_TRID_DIM**2),) * _TRID_DIM,
+            _normalized_trid_reward,
+            _TRID_OPTIMUM,
+            0.0,
+        ),
+        "sum_powers_normalized_30d": Benchmark(
+            "sum_powers_normalized_30d",
+            "Sum of Different Powers 30D (normalized)",
+            _SUM_POWERS_DIM,
+            (-1.0,) * _SUM_POWERS_DIM,
+            (1.0,) * _SUM_POWERS_DIM,
+            _normalized_sum_powers_reward,
+            (0.0,) * _SUM_POWERS_DIM,
+            0.0,
+        ),
+    }
+)
+
+ADDITIONAL_SFU_SCREEN = (
+    "dixon_price_normalized_10d",
+    "powell_normalized_12d",
+    "zakharov_normalized_20d",
+    "schwefel_mean_20d",
+    "trid_normalized_10d",
+    "sum_powers_normalized_30d",
 )
 
 
@@ -502,6 +685,22 @@ for _dimension in (2, 5, 10):
         (1.0,) * _dimension,
         0.0,
     )
+
+
+# The 10D Griewank panel is used by the main six-objective comparison and by
+# the acquisition-wise alpha sweeps. Keep it alongside the lower-dimensional
+# registrations because the high-dimensional loop below covers only 20D/30D.
+_GRIEWANK10_SHIFT = _fixed_shift(10, 200.0)
+BENCHMARKS["griewank_mean_shifted_10d"] = Benchmark(
+    "griewank_mean_shifted_10d",
+    "Shifted Griewank 10D (mean)",
+    10,
+    (-600.0,) * 10,
+    (600.0,) * 10,
+    _shifted_reward(_mean_griewank_reward, _GRIEWANK10_SHIFT),
+    tuple(float(value) for value in _GRIEWANK10_SHIFT),
+    0.0,
+)
 
 
 # Controlled high-dimensional extension. Ackley and Rastrigin use the standard
