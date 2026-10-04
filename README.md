@@ -57,7 +57,6 @@ scripts/                        experiment and plotting entry points
 configs/                        recorded experiment protocols
 results/                        aggregate results, audits, and figures
 docs/                           method and reproducibility notes
-paper/                          earlier consolidated research-report snapshot
 ```
 
 The release omits large per-iteration trial collections, preliminary screens,

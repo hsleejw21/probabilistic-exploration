@@ -7,7 +7,5 @@ dist/
 *.egg-info/
 results/**/trials/
 results/**/history.csv
-paper/*.aux
-paper/*.log
-paper/*.out
+/paper/
 .DS_Store
