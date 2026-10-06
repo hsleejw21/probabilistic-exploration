@@ -1,6 +1,6 @@
 {
   "title": "Probabilistic Exploration for Efficient Bayesian Optimization",
-  "as_of": "2026-10-03",
+  "as_of": "2026-10-06",
   "sign_convention": "positive favors the first method named; Greedy Packing figures show Uniform over Standard, Greedy over Standard, and Greedy over Uniform",
   "included": [
     {
@@ -8,6 +8,11 @@
       "status": "complete",
       "scope": "8 objectives; GP-UCB, LogEI, and GP-TS; Standard plus five Uniform and five Greedy Packing schedules; 20 paired runs",
       "paper_snapshot": true
+    },
+    {
+      "id": "synthetic_lowdim_mvr_runtime",
+      "status": "complete",
+      "scope": "Ackley 2D and Rastrigin 2D; Standard, Uniform PE, and MVR PE; 15 paired seeds; endpoint regret and measured runtime"
     },
     {
       "id": "synthetic_acquisition_30d",
@@ -56,16 +61,14 @@
     }
   ],
   "excluded": [
-    "quota and qplus methods",
-    "Rover experiments",
-    "older fixed-beta GP-TS runs",
-    "stopped optional 1000-evaluation 30D GP-TS run",
-    "separately supplied professor-code comparison",
-    "preliminary Greedy Packing setting sweeps"
+    "large per-iteration trial collections",
+    "preliminary screening runs not used in the released comparisons",
+    "machine-specific launch scripts, paths, logs, and credentials",
+    "the manuscript source and local paper build"
   ],
   "notes": [
     "The current paper-facing synthetic snapshot uses 20 paired runs.",
-    "A separate 10-seed extension was still in progress when this snapshot was prepared and is not included.",
-    "Earlier completed studies remain in the release for provenance."
+    "Runtime values are machine and load dependent; paired comparisons are the intended use.",
+    "Earlier completed aggregate studies remain available for provenance."
   ]
 }

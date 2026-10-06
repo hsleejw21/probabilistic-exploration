@@ -79,6 +79,20 @@ lunar:
   heldout_terrains_per_controller: 200
   package: gymnasium[box2d]==1.3.0
 
+lowdim_mvr_runtime:
+  objectives: [ackley_shifted_narrow_2d, rastrigin_mean_rotated_shifted_2d]
+  dimension: 2
+  acquisition: {name: ucb, beta_mode: constant, beta: 2.0}
+  policies: [standard, decay_uniform_grid_a1_2, decay_mvr_grid_a1_2]
+  alpha: 0.5
+  budget:
+    initial_scrambled_sobol: 2
+    bo_evaluations: 400
+    total_evaluations: 402
+  repetitions: 15
+  paired_within: [objective, seed]
+  runtime_excludes: [job_launch, file_io]
+
 environment:
   python: "3.12"
   numpy: ">=1.26.4,<3"

@@ -81,6 +81,52 @@ Rebuild all three synthetic figures from these aggregates:
 python scripts/plot_aistats2027_synthetic.py
 ```
 
+YAHPO endpoint comparisons and Lunar held-out comparisons are also rebuilt
+from released aggregates by `scripts/plot_greedy_packing.py`. Rebuild the
+complete aggregate-backed figure set with:
+
+```bash
+bash scripts/build_released_figures.sh
+```
+
+Per-iteration YAHPO trajectories require the omitted raw `history.csv` files,
+and the Lunar storyboard requires rollout media. Their existing exported
+figures are retained as result artifacts, while the compact public package
+focuses its one-command rebuild on figures supported by released inputs.
+
+## Low-dimensional runtime comparison
+
+The appendix runtime comparison uses Ackley 2D and Rastrigin 2D with GP-UCB,
+two initial observations, 400 BO evaluations, and 15 paired seeds. Standard
+uses GP-UCB at every round. Uniform PE and MVR PE share the `alpha=1/2`
+exploration decisions; MVR optimizes posterior variance on those rounds.
+
+Rebuild the released figure from its compact per-seed aggregate:
+
+```bash
+python scripts/plot_lowdim_runtime.py
+```
+
+To rerun the experiment and rebuild both aggregate and figure:
+
+```bash
+bash scripts/run_lowdim_runtime.sh /tmp/lowdim-runtime 1 9100 15
+```
+
+The runtime is the sum of per-round query selection, objective evaluation, GP
+fit, recommendation, and posterior-diagnostic times. Launcher and file-I/O
+time are excluded. Use one worker on an otherwise idle CPU for the least noisy
+timing comparison; the released snapshot used the common server configuration
+recorded in its `protocol.json`, so its absolute seconds are machine dependent.
+
+## Anonymity and release boundaries
+
+The `paper/` directory is ignored and is not part of the release. Public text
+and generated files should not contain names, email addresses, institutional
+paths, hostnames, credentials, or machine-specific output directories. Git
+remote URLs and commit authorship are separate hosting metadata; use a fresh
+anonymous remote with clean metadata for double-blind review.
+
 The release retains earlier completed studies under their existing result
 directories. Their local protocol and audit files remain authoritative for
 those snapshots.

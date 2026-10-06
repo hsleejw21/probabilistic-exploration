@@ -1,0 +1,13 @@
+objective,metric,baseline_method,candidate_method,n,mean_improvement,bootstrap_ci95_low,bootstrap_ci95_high
+ackley_shifted_narrow_2d,final_regret,Standard,Uniform,15,0.036319871282556454,0.022928360620968938,0.05031789218258588
+ackley_shifted_narrow_2d,final_regret,Standard,MVR,15,-0.39591018070101996,-0.8899202435152554,0.002312667735932343
+ackley_shifted_narrow_2d,final_regret,Uniform,MVR,15,-0.4322300519835764,-0.9253128074264785,-0.03545859001000771
+ackley_shifted_narrow_2d,runtime,Standard,Uniform,15,70.14330226279175,55.78003759165605,83.50415008880353
+ackley_shifted_narrow_2d,runtime,Standard,MVR,15,-11.872712069920569,-27.00389904939181,2.0904454153558873
+ackley_shifted_narrow_2d,runtime,Uniform,MVR,15,-82.01601433271232,-89.58123425348042,-74.43513070860645
+rastrigin_mean_rotated_shifted_2d,final_regret,Standard,Uniform,15,0.1434999341999829,-0.39618254359613453,0.6726618130215779
+rastrigin_mean_rotated_shifted_2d,final_regret,Standard,MVR,15,-0.07134981708447143,-0.4245030583661827,0.28284837200452945
+rastrigin_mean_rotated_shifted_2d,final_regret,Uniform,MVR,15,-0.21484975128445433,-0.744049493599494,0.3382541639547807
+rastrigin_mean_rotated_shifted_2d,runtime,Standard,Uniform,15,53.575330731024344,43.558498698965806,63.45472875228966
+rastrigin_mean_rotated_shifted_2d,runtime,Standard,MVR,15,-8.79785778938482,-16.755353360444616,-0.8790060673793831
+rastrigin_mean_rotated_shifted_2d,runtime,Uniform,MVR,15,-62.373188520409165,-67.29279162779102,-57.42198120640243

@@ -1,0 +1,48 @@
+{
+  "study": "low-dimensional Uniform PE and MVR runtime comparison",
+  "objectives": [
+    "ackley_shifted_narrow_2d",
+    "rastrigin_mean_rotated_shifted_2d"
+  ],
+  "dimension": 2,
+  "acquisition": "GP-UCB",
+  "ucb_posterior_standard_deviation_multiplier": 2.0,
+  "methods": {
+    "Standard": "GP-UCB at every BO round",
+    "Uniform": "Uniform PE with alpha=1/2",
+    "MVR": "Posterior-variance-maximizing PE with alpha=1/2"
+  },
+  "schedule": "min(1, log(t+1)/(t+1)^alpha)",
+  "alpha": 0.5,
+  "paired_seed_start": 9100,
+  "num_paired_seeds": 15,
+  "initial_design": "2 scrambled Sobol observations",
+  "bo_evaluations": 400,
+  "total_evaluations": 402,
+  "gp": {
+    "kernel": "Matern-3/2",
+    "center_targets": true,
+    "signal_variance": 1.0,
+    "learn_signal_variance": false,
+    "initial_lengthscale": 0.5,
+    "lengthscale_bounds": [
+      0.01,
+      20.0
+    ],
+    "refit_interval": 5,
+    "observation_noise_variance": 0.01,
+    "gp_nugget_variance": 0.01
+  },
+  "optimization": {
+    "acquisition_restarts": 20,
+    "recommendation_restarts": 20,
+    "mvr_restarts": 20,
+    "recommendation_includes_evaluated_inputs": true
+  },
+  "runtime_definition": "Sum of per-round wall-clock measurements for query selection, objective evaluation, GP fitting, recommendation, and posterior diagnostics; job launch and file I/O are excluded.",
+  "runtime_environment": {
+    "worker_processes": 12,
+    "blas_threads_per_process": 1,
+    "note": "Absolute runtimes are machine and load dependent."
+  }
+}

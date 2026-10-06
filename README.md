@@ -49,6 +49,15 @@ All five Uniform and Greedy Packing schedules are included in the release.
   Greedy Packing improve the LogEI controller on 200 shared held-out terrains;
   their direct difference is inconclusive.
 
+### Computational comparison
+
+The release also includes a 15-seed comparison of Standard GP-UCB, Uniform PE,
+and posterior-variance-maximizing PE on Ackley 2D and Rastrigin 2D. Uniform PE
+has the lowest mean runtime on both objectives because a random PE query avoids
+continuous acquisition or variance optimization on exploration rounds. The
+released per-seed aggregate records both final inference regret and measured
+end-to-end optimizer runtime.
+
 ## Repository map
 
 ```text
@@ -74,10 +83,10 @@ python scripts/run_synthetic.py \
   --profile smoke --jobs 2 --output-dir /tmp/pe-smoke
 ```
 
-Rebuild the current synthetic figures with:
+Rebuild every figure supported by the released aggregate results with:
 
 ```bash
-python scripts/plot_aistats2027_synthetic.py
+bash scripts/build_released_figures.sh
 ```
 
 Run one acquisition block of the full eight-benchmark protocol with:
@@ -88,6 +97,14 @@ bash scripts/run_aistats2027_synthetic.sh ucb /tmp/aistats2027 0 20 12
 
 See [the method](docs/method.md), [reproduction notes](docs/reproducibility.md),
 the exact [AISTATS 2027 protocol](configs/aistats2027.yaml), and the
-[experiment index](results/README.md).
+[experiment index](results/README.md). The [script index](scripts/README.md)
+maps released figures to their experiment and plotting entry points and shows
+where to add new objectives, acquisitions, and exploration rules.
+
+The manuscript source and local paper build are intentionally excluded from
+this code release. Repository text and generated artifacts omit author names,
+institutional paths, hostnames, and credentials. Git hosting URLs and commit
+metadata are external to the repository contents and must also be anonymized
+when the repository is used for double-blind review.
 
 The project license has not yet been specified.

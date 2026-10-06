@@ -32,8 +32,8 @@ from probabilistic_exploration.plot_style import (
 
 
 RESULT_DIR = ROOT / "results" / "synthetic" / "greedy_packing"
-FIGURE_DIR = ROOT / "paper" / "figures"
-TABLE_DIR = ROOT / "paper" / "tables"
+FIGURE_DIR = RESULT_DIR / "figures"
+TABLE_DIR = RESULT_DIR / "tables"
 
 UNIFORM_BLUE = PE_BLUE
 GREEDY_GREEN = "#16845B"
@@ -251,34 +251,49 @@ def plot_yahpo(
 
 def plot_lunar(path: Path, output_dir: Path) -> None:
     frame = pd.read_csv(path)
-    frame = frame[frame["metric"] == "mean_return"].copy()
     keys = (
         ("decay_uniform_grid_a1_2", "standard"),
         ("decay_greedy_packing_grid_a1_2", "standard"),
         ("decay_greedy_packing_grid_a1_2", "decay_uniform_grid_a1_2"),
     )
     labels = tuple(value[0] for value in CONTRASTS)
-    fig, axis = plt.subplots(figsize=(WIDTH_TWO_THIRDS, 3.7))
-    axis.axvline(0.0, color=TEXT_SECONDARY, linewidth=1.0, linestyle="--", zorder=0)
-    for y, key, (_, color, marker, _) in zip(np.arange(3)[::-1], keys, CONTRASTS):
-        source = frame[(frame["policy"] == key[0]) & (frame["reference"] == key[1])].iloc[0]
-        row = pd.Series(
-            {
-                "improvement": source["paired_mean_difference"],
-                "ci_low": source["bootstrap_ci95_lower"],
-                "ci_high": source["bootstrap_ci95_upper"],
-            }
+    metrics = (
+        ("mean_return", "Mean return", 1.0),
+        ("episode_success_rate", "Landing rate (percentage points)", 100.0),
+        ("bottom_10pct_mean_return", "Worst-10% mean return", 1.0),
+    )
+    fig, axes = plt.subplots(
+        1, 3, figsize=(WIDTH_FULL, 4.0), sharey=True, constrained_layout=False
+    )
+    for axis, (metric, xlabel, scale) in zip(axes, metrics):
+        selected = frame[frame["metric"] == metric]
+        axis.axvline(
+            0.0, color=TEXT_SECONDARY, linewidth=1.0, linestyle="--", zorder=0
         )
-        draw_point(axis, row, y, color, marker)
-    axis.set_yticks(np.arange(3)[::-1], labels)
-    axis.set_xlabel("Held-out mean-return improvement")
-    style_axis(axis, grid_axis="x")
+        for y, key, (_, color, marker, _) in zip(
+            np.arange(3)[::-1], keys, CONTRASTS
+        ):
+            source = selected[
+                (selected["policy"] == key[0])
+                & (selected["reference"] == key[1])
+            ].iloc[0]
+            row = pd.Series(
+                {
+                    "improvement": scale * source["paired_mean_difference"],
+                    "ci_low": scale * source["bootstrap_ci95_lower"],
+                    "ci_high": scale * source["bootstrap_ci95_upper"],
+                }
+            )
+            draw_point(axis, row, y, color, marker)
+        axis.set_yticks(np.arange(3)[::-1], labels)
+        axis.set_xlabel(xlabel)
+        style_axis(axis, grid_axis="x")
     fig.text(
         0.5, 0.02,
         "Thirty paired controllers on the same 200 unseen terrains. Positive favours the first method.",
         ha="center", color=TEXT_SECONDARY,
     )
-    fig.subplots_adjust(left=0.27, right=0.99, top=0.96, bottom=0.25)
+    fig.subplots_adjust(left=0.16, right=0.99, top=0.96, bottom=0.25, wspace=0.30)
     save_figure(fig, output_dir, "fig_greedy_packing_lunar")
     plt.close(fig)
 
@@ -537,10 +552,28 @@ def main() -> int:
     )
     parser.add_argument("--output-dir", type=Path, default=FIGURE_DIR)
     parser.add_argument("--table-dir", type=Path, default=TABLE_DIR)
+    parser.add_argument(
+        "--paper-only",
+        action="store_true",
+        help="Build only the YAHPO and Lunar endpoint figures used by the current release.",
+    )
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.table_dir.mkdir(parents=True, exist_ok=True)
     apply_publication_style()
+
+    if args.paper_only:
+        plot_yahpo(
+            load_yahpo(args.yahpo_result_dir / "default"),
+            args.output_dir,
+            "fig_greedy_packing_yahpo",
+            "Thirty paired seeds. Positive values favour the first method named; panels use independent scales.",
+        )
+        plot_lunar(
+            args.lunar_result_dir / "default" / "paired_comparisons.csv",
+            args.output_dir,
+        )
+        return 0
 
     acquisition = load_contrasts(
         args.result_dir / "acquisition_30d" / "paired_comparisons.csv"

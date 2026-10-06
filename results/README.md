@@ -3,6 +3,7 @@
 | Study | Status | Purpose | Public contents |
 |---|---|---|---|
 | Eight-benchmark synthetic alpha sweep | Complete, 20-seed paper snapshot | Compare Standard and Uniform across three acquisitions; report Uniform and Greedy Packing schedule sensitivity | aggregate trajectories, endpoint CSVs, protocol, figures |
+| Low-dimensional MVR runtime | Complete, 15 paired seeds | Compare Standard, Uniform PE, and MVR PE in endpoint regret and computation time | per-seed aggregate, summary, protocol, PDF/PNG figure |
 | YAHPO high-dimensional HPO | Complete | Test PE on 14D XGBoost and 28D joint-tuning surrogate tasks | aggregate CSVs, audits, figures, protocol |
 | Lunar Lander 12D | Complete | Test controller tuning and held-out terrain generalization | aggregate CSVs, audits, figures, protocol |
 | 30D acquisition generalization | Earlier completed snapshot | Test PE across UCB, LogEI, MES-Gumbel, and GP-TS | aggregate CSVs, audit, figures |
@@ -21,3 +22,6 @@ Raw trial histories and preliminary screens are intentionally omitted. Each
 included completed study retains its protocol and aggregate outputs; studies
 from earlier research stages remain available for provenance but should not be
 confused with the current eight-benchmark protocol.
+
+The paper-facing plotting entry points and their inputs are indexed in
+[`scripts/README.md`](../scripts/README.md).

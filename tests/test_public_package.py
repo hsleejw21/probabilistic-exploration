@@ -203,11 +203,63 @@ def test_current_synthetic_release_is_complete():
     assert {row["n_seeds"] for row in trajectories} == {"20"}
 
 
+def test_lowdim_runtime_release_is_complete():
+    directory = (
+        Path(__file__).resolve().parents[1]
+        / "results"
+        / "synthetic"
+        / "lowdim_mvr_runtime"
+    )
+    protocol = json.loads((directory / "protocol.json").read_text())
+    assert protocol["num_paired_seeds"] == 15
+    assert protocol["bo_evaluations"] == 400
+    assert protocol["alpha"] == 0.5
+
+    with (directory / "per_seed.csv").open(newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 2 * 3 * 15
+    assert {row["method"] for row in rows} == {"Standard", "Uniform", "MVR"}
+    pairs = {(row["objective"], row["seed"]) for row in rows}
+    assert len(pairs) == 2 * 15
+
+    with (directory / "summary.csv").open(newline="") as handle:
+        summary = list(csv.DictReader(handle))
+    assert len(summary) == 2 * 3
+    assert {row["n"] for row in summary} == {"15"}
+    with (directory / "paired_comparisons.csv").open(newline="") as handle:
+        comparisons = list(csv.DictReader(handle))
+    assert len(comparisons) == 2 * 2 * 3
+    assert {row["n"] for row in comparisons} == {"15"}
+    assert (directory / "figures" / "fig_appendix_lowdim_mvr_runtime.pdf").is_file()
+    assert (directory / "figures" / "fig_appendix_lowdim_mvr_runtime.png").is_file()
+
+
+def test_released_figure_builder_only_uses_public_entry_points():
+    root = Path(__file__).resolve().parents[1]
+    builder = root / "scripts" / "build_released_figures.sh"
+    text = builder.read_text()
+    assert "plot_aistats2027_synthetic.py" in text
+    assert "plot_lowdim_runtime.py" in text
+    assert "plot_greedy_packing.py" in text
+    assert "paper/" not in text
+    assert "history.csv" not in text
+
+
 def test_public_text_artifacts_do_not_contain_server_paths():
     root = Path(__file__).resolve().parents[1]
     extensions = {".csv", ".json", ".md", ".py", ".tex", ".txt", ".tsv"}
-    private_prefix = "/" + "nfsdata" + "/ho" + "me/"
+    private_markers = (
+        "/" + "nfsdata" + "/ho" + "me/",
+        "/" + "Users" + "/",
+        "hong" + "jungwoo",
+        "lgresearch" + ".ai",
+    )
     for path in root.rglob("*"):
-        if path.is_file() and path.suffix in extensions and ".git" not in path.parts:
+        excluded = {".git", ".venv", "paper", "__pycache__"}
+        if (
+            path.is_file()
+            and path.suffix in extensions
+            and not excluded.intersection(path.parts)
+        ):
             text = path.read_text(errors="ignore")
-            assert private_prefix not in text, path
+            assert not any(marker in text for marker in private_markers), path
