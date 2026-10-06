@@ -15,60 +15,25 @@
       "scope": "Ackley 2D and Rastrigin 2D; Standard, Uniform PE, and MVR PE; 15 paired seeds; endpoint regret and measured runtime"
     },
     {
-      "id": "synthetic_acquisition_30d",
-      "status": "complete",
-      "gp_ts": "logarithmic beta and growing fresh Sobol candidates"
-    },
-    {
-      "id": "synthetic_dimension_alpha",
-      "status": "complete"
-    },
-    {
-      "id": "synthetic_practical_alpha",
-      "status": "exploratory"
-    },
-    {
       "id": "lunar_12d",
-      "status": "complete"
-    },
-    {
-      "id": "sklearn_hpo",
-      "status": "complete"
+      "status": "complete",
+      "scope": "12D controller tuning across acquisitions; 30 paired runs; LogEI held-out comparison on 200 shared terrains"
     },
     {
       "id": "yahpo_highdim_hpo",
-      "status": "complete"
-    },
-    {
-      "id": "synthetic_greedy_packing",
       "status": "complete",
-      "scope": "30D acquisition comparison; Rastrigin 2D--30D; fresh-seed validation; Ackley and Rosenbrock transfer"
-    },
-    {
-      "id": "yahpo_greedy_packing",
-      "status": "complete",
-      "scope": "14D and 28D; default grid on 30 seeds; fourfold grid on 15 fresh seeds"
-    },
-    {
-      "id": "lunar_greedy_packing",
-      "status": "complete",
-      "scope": "LogEI; 30 paired controllers; 200 held-out terrains per controller"
-    },
-    {
-      "id": "greedy_grid_robustness",
-      "status": "complete",
-      "scope": "default, twofold, and fourfold finite-grid checks across synthetic, YAHPO, and Lunar studies"
+      "scope": "14D XGBoost and 28D joint tuning tasks; four acquisitions; 30 paired runs"
     }
   ],
   "excluded": [
     "large per-iteration trial collections",
-    "preliminary screening runs not used in the released comparisons",
+    "preliminary screens, grid-size checks, and superseded result snapshots",
     "machine-specific launch scripts, paths, logs, and credentials",
     "the manuscript source and local paper build"
   ],
   "notes": [
     "The current paper-facing synthetic snapshot uses 20 paired runs.",
     "Runtime values are machine and load dependent; paired comparisons are the intended use.",
-    "Earlier completed aggregate studies remain available for provenance."
+    "Only result sets used by the current manuscript are included."
   ]
 }

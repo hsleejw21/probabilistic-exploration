@@ -1,3 +1,0 @@
-dimension	growth	alpha_slug	policy	mean_inference_regret
-10	4	1_2	decay_greedy_packing_grid_a1_2	1.901723784439516
-30	16	1_2	decay_greedy_packing_grid_a1_2	3.4007284954702746

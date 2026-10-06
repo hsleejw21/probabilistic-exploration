@@ -9,13 +9,13 @@ Plotters read released aggregates unless an alternative directory is supplied.
 | Study | Experiment entry point | Figure entry point | Released aggregate |
 |---|---|---|---|
 | Eight synthetic benchmarks | `run_aistats2027_synthetic.sh` | `plot_aistats2027_synthetic.py` | `results/synthetic/eight_benchmark_alpha_sweep/` |
-| YAHPO endpoint comparisons | `run_yahpo_hpo.py` | `plot_greedy_packing.py` | `results/hpo_yahpo/greedy_packing/` |
-| Lunar held-out comparison | `run_lunar.py` | `plot_greedy_packing.py` | `results/lunar/greedy_packing/` |
+| YAHPO endpoint comparisons | `run_yahpo_hpo.py` | `plot_application_results.py` | `results/hpo_yahpo/greedy_packing/default/` |
+| Lunar held-out comparison | `run_lunar.py` | `plot_application_results.py` | `results/lunar/greedy_packing/default/` |
 | Low-dimensional MVR runtime | `run_lowdim_runtime.sh` | `plot_lowdim_runtime.py` | `results/synthetic/lowdim_mvr_runtime/` |
 
 The Uniform and Greedy Packing schedule-sensitivity panels are both generated
-by `plot_aistats2027_synthetic.py`. Cross-domain Greedy Packing analyses use
-`plot_greedy_packing.py`. Rebuild the complete aggregate-backed figure set with:
+by `plot_aistats2027_synthetic.py`. Rebuild the complete aggregate-backed
+figure set with:
 
 ```bash
 bash scripts/build_released_figures.sh

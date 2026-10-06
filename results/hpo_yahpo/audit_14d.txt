@@ -1,2 +1,0 @@
-PASS: trials=1440, budget=120, rows=172800, n_initial=10,
-signal_variance=1, paired_initial_design=true, seeds=5..34.

@@ -1,5 +1,0 @@
-PASS
-matched_trials=135
-paired_initial=True
-paired_pe_schedule=True
-fixed_signal_variance=True

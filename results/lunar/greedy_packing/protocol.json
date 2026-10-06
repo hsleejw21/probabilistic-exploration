@@ -16,12 +16,7 @@
   "training_terrains_per_evaluation": 50,
   "heldout_terrains_per_controller": 200,
   "paired_training_seeds": 30,
-  "grid_confirmation_seeds": 15,
-  "greedy_grids": {
-    "default": "256 + ceil(16 t)",
-    "grid2x": "512 + ceil(32 t)",
-    "grid4x": "1024 + ceil(64 t)"
-  },
+  "greedy_grid": "256 + ceil(16 t)",
   "pairing": "Policies share initial observations within a BO seed; held-out controllers share the same episode bank",
   "sign_convention": "positive paired mean difference favors the named candidate"
 }

@@ -1,4 +1,0 @@
-objective,acquisition,beta_mode,policy,n_seeds,mean,median,std
-rastrigin_mean_rotated_shifted_10d,ucb,constant,decay_greedy_packing_grid_a1_2,10,4.432479801237846,3.6687715536202288,2.765931786214355
-rastrigin_mean_rotated_shifted_10d,ucb,constant,decay_uniform_grid_a1_2,10,6.602632927094658,7.399186509167054,3.8420256198768548
-rastrigin_mean_rotated_shifted_10d,ucb,constant,standard,10,8.133245167208617,9.05870893152452,2.658473123365618

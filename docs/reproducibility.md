@@ -82,7 +82,7 @@ python scripts/plot_aistats2027_synthetic.py
 ```
 
 YAHPO endpoint comparisons and Lunar held-out comparisons are also rebuilt
-from released aggregates by `scripts/plot_greedy_packing.py`. Rebuild the
+from released aggregates by `scripts/plot_application_results.py`. Rebuild the
 complete aggregate-backed figure set with:
 
 ```bash
@@ -127,6 +127,5 @@ paths, hostnames, credentials, or machine-specific output directories. Git
 remote URLs and commit authorship are separate hosting metadata; use a fresh
 anonymous remote with clean metadata for double-blind review.
 
-The release retains earlier completed studies under their existing result
-directories. Their local protocol and audit files remain authoritative for
-those snapshots.
+The release contains only the result sets used by the current manuscript.
+Earlier pilot studies, grid-size checks, and superseded snapshots are omitted.

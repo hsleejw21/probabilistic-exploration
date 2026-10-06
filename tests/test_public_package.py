@@ -128,36 +128,17 @@ def test_public_figures_use_stable_semantic_colours_and_labels():
     assert ACQUISITION_ORDER[:4] == ("ucb", "ts", "logei", "mes_gumbel")
 
 
-def test_completed_yahpo_28d_release_is_audited():
-    result_dir = Path(__file__).resolve().parents[1] / "results" / "hpo_yahpo"
-    protocol = json.loads((result_dir / "protocol.json").read_text())
-    assert protocol["completed_dimensions"] == [14, 28]
-    assert protocol["in_progress_dimensions"] == []
-
-    with (result_dir / "paired_improvements_28d.csv").open(newline="") as handle:
-        comparisons = list(csv.DictReader(handle))
-    assert len(comparisons) == 24
-    assert sum(float(row["bootstrap_ci95_low"]) > 0 for row in comparisons) == 2
-    assert sum(float(row["bootstrap_ci95_high"]) < 0 for row in comparisons) == 0
-
-    audit = (result_dir / "audit_28d.txt").read_text()
-    assert audit.startswith("PASS ")
-    assert "trials=960" in audit
-    assert "budget=200" in audit
-
-
 def test_greedy_application_results_are_complete_and_audited():
     root = Path(__file__).resolve().parents[1] / "results"
     yahpo = root / "hpo_yahpo" / "greedy_packing"
     expected_rows = {14: 36, 28: 24}
-    for stage, expected_seeds in (("default", 30), ("grid4x_fresh", 15)):
-        for dimension, expected_comparisons in expected_rows.items():
-            directory = yahpo / stage / f"{dimension}d"
-            protocol = json.loads((directory / "protocol.json").read_text())
-            assert protocol["num_seeds"] == expected_seeds
-            with (directory / "paired_comparisons.csv").open(newline="") as handle:
-                assert len(list(csv.DictReader(handle))) == expected_comparisons
-            assert (directory / "audit.txt").read_text().startswith("PASS ")
+    for dimension, expected_comparisons in expected_rows.items():
+        directory = yahpo / "default" / f"{dimension}d"
+        protocol = json.loads((directory / "protocol.json").read_text())
+        assert protocol["num_seeds"] == 30
+        with (directory / "paired_comparisons.csv").open(newline="") as handle:
+            assert len(list(csv.DictReader(handle))) == expected_comparisons
+        assert (directory / "audit.txt").read_text().startswith("PASS ")
 
     lunar = root / "lunar" / "greedy_packing"
     protocol = json.loads((lunar / "protocol.json").read_text())
@@ -165,11 +146,32 @@ def test_greedy_application_results_are_complete_and_audited():
     assert protocol["heldout_terrains_per_controller"] == 200
     with (lunar / "default" / "paired_comparisons.csv").open(newline="") as handle:
         assert len(list(csv.DictReader(handle))) == 9
+    assert (root / "hpo_yahpo" / "figures" / "fig_appendix_hpo_acquisitions.pdf").is_file()
+    assert (root / "lunar" / "fig_appendix_lunar_heldout.pdf").is_file()
 
-    synthetic = root / "synthetic" / "greedy_packing" / "grid4x_confirmation"
-    with (synthetic / "summary.csv").open(newline="") as handle:
-        assert len(list(csv.DictReader(handle))) == 18
 
+def test_release_contains_only_current_result_families():
+    root = Path(__file__).resolve().parents[1] / "results"
+    assert {path.name for path in root.iterdir() if path.is_dir()} == {
+        "hpo_yahpo",
+        "lunar",
+        "synthetic",
+    }
+    synthetic = root / "synthetic"
+    assert {path.name for path in synthetic.iterdir() if path.is_dir()} == {
+        "eight_benchmark_alpha_sweep",
+        "lowdim_mvr_runtime",
+    }
+    assert {
+        path.name
+        for path in (root / "hpo_yahpo" / "greedy_packing").iterdir()
+        if path.is_dir()
+    } == {"default"}
+    assert {
+        path.name
+        for path in (root / "lunar" / "greedy_packing").iterdir()
+        if path.is_dir()
+    } == {"default"}
 
 def test_current_synthetic_release_is_complete():
     directory = (
@@ -240,7 +242,7 @@ def test_released_figure_builder_only_uses_public_entry_points():
     text = builder.read_text()
     assert "plot_aistats2027_synthetic.py" in text
     assert "plot_lowdim_runtime.py" in text
-    assert "plot_greedy_packing.py" in text
+    assert "plot_application_results.py" in text
     assert "paper/" not in text
     assert "history.csv" not in text
 
