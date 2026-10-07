@@ -8,12 +8,11 @@ Plotters read released aggregates unless an alternative directory is supplied.
 
 | Study | Experiment entry point | Figure entry point | Released aggregate |
 |---|---|---|---|
-| Eight synthetic benchmarks | `run_aistats2027_synthetic.sh` | `plot_aistats2027_synthetic.py` | `results/synthetic/eight_benchmark_alpha_sweep/` |
+| Six synthetic benchmarks | `run_aistats2027_synthetic.sh` | `plot_aistats2027_synthetic.py` | `results/synthetic/six_benchmark_alpha_sweep/` |
 | YAHPO endpoint comparisons | `run_yahpo_hpo.py` | `plot_application_results.py` | `results/hpo_yahpo/greedy_packing/default/` |
-| Lunar held-out comparison | `run_lunar.py` | `plot_application_results.py` | `results/lunar/greedy_packing/default/` |
 | Low-dimensional MVR runtime | `run_lowdim_runtime.sh` | `plot_lowdim_runtime.py` | `results/synthetic/lowdim_mvr_runtime/` |
 
-The Uniform and Greedy Packing schedule-sensitivity panels are both generated
+The Uniform schedule sweep and both selected-exponent and alpha=1/2 trajectories are generated
 by `plot_aistats2027_synthetic.py`. Rebuild the complete aggregate-backed
 figure set with:
 
@@ -32,7 +31,7 @@ The core implementation is under `src/probabilistic_exploration/`:
 
 - register synthetic objectives in `benchmarks.py`;
 - implement acquisitions in `acquisitions.py`;
-- add PE query rules and schedules in `exploration.py`;
+- add exploration query rules and schedules in `exploration.py`;
 - expose reusable protocol defaults in `config.py`;
 - keep visual constants or reusable exporters in `plot_style.py`.
 

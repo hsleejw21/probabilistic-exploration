@@ -1,9 +1,7 @@
 {
   "status": "complete_paper_snapshot",
-  "as_of": "2026-10-03",
+  "as_of": "2026-10-07",
   "objectives": [
-    "hartmann6_active_6d",
-    "griewank_mean_shifted_10d",
     "trid_normalized_10d",
     "rosenbrock_mean_20d",
     "bent_cigar_shifted_30d",
@@ -11,9 +9,21 @@
     "griewank_mean_shifted_30d",
     "sum_powers_normalized_30d"
   ],
-  "acquisitions": ["ucb", "logei", "ts"],
-  "alpha_grid": [0.25, 0.3333333333333333, 0.5, 0.6666666666666666, 0.75],
-  "exploration_rules": ["uniform", "greedy_packing"],
+  "acquisitions": [
+    "ucb",
+    "logei",
+    "ts"
+  ],
+  "alpha_grid": [
+    0.25,
+    0.3333333333333333,
+    0.5,
+    0.6666666666666666,
+    0.75
+  ],
+  "exploration_rules": [
+    "uniform"
+  ],
   "schedule": "min(1, log(t + 1) / (t + 1)^alpha)",
   "num_paired_runs": 20,
   "n_initial": 2,
@@ -35,7 +45,10 @@
     "learn_signal_variance": false,
     "observation_noise_variance": 0.01,
     "nugget_variance": 0.01,
-    "lengthscale_bounds": [0.01, 20.0],
+    "lengthscale_bounds": [
+      0.01,
+      20.0
+    ],
     "refit_interval": 5
   },
   "optimization": {
@@ -48,9 +61,5 @@
     "covariance_multiplier": "log(t + 1)",
     "candidate_design": "fresh scrambled Sobol",
     "candidate_count": "clip(ceil(64 * sqrt(t)), 128, 512)"
-  },
-  "greedy_packing": {
-    "candidate_design": "nested scrambled Sobol",
-    "candidate_count": "256 + ceil(16 * t)"
   }
 }

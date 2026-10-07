@@ -1,8 +1,6 @@
 synthetic:
   status: paper_snapshot_20_seeds
   objectives:
-    - hartmann6_active_6d
-    - griewank_mean_shifted_10d
     - trid_normalized_10d
     - rosenbrock_mean_20d
     - bent_cigar_shifted_30d
@@ -23,11 +21,6 @@ synthetic:
     - decay_uniform_grid_a1_2
     - decay_uniform_grid_a2_3
     - decay_uniform_grid_a3_4
-    - decay_greedy_packing_grid_a1_4
-    - decay_greedy_packing_grid_a1_3
-    - decay_greedy_packing_grid_a1_2
-    - decay_greedy_packing_grid_a2_3
-    - decay_greedy_packing_grid_a3_4
   schedule: "min(1, log(t + 1) / (t + 1)^alpha)"
   budget:
     initial_scrambled_sobol: 2
@@ -63,10 +56,10 @@ yahpo:
   repetitions: 30
   initial_design: 10
   xgboost_14d:
-    tasks: [credit-g, car, blood-transfusion-service-center]
+    tasks: [car]
     total_evaluations: 120
   joint_tuning_28d:
-    instances: [40981, 41146]
+    instances: [41146]
     total_evaluations: 200
 
 lunar:
@@ -76,7 +69,6 @@ lunar:
   initial_design: 24
   total_evaluations: 400
   terrains_per_evaluation: 50
-  heldout_terrains_per_controller: 200
   package: gymnasium[box2d]==1.3.0
 
 lowdim_mvr_runtime:

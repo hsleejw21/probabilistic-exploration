@@ -1,39 +1,47 @@
 {
-  "title": "Probabilistic Exploration for Efficient Bayesian Optimization",
-  "as_of": "2026-10-06",
-  "sign_convention": "positive favors the first method named; Greedy Packing figures show Uniform over Standard, Greedy over Standard, and Greedy over Uniform",
-  "included": [
-    {
-      "id": "synthetic_eight_benchmark_alpha_sweep",
-      "status": "complete",
-      "scope": "8 objectives; GP-UCB, LogEI, and GP-TS; Standard plus five Uniform and five Greedy Packing schedules; 20 paired runs",
-      "paper_snapshot": true
-    },
-    {
-      "id": "synthetic_lowdim_mvr_runtime",
-      "status": "complete",
-      "scope": "Ackley 2D and Rastrigin 2D; Standard, Uniform PE, and MVR PE; 15 paired seeds; endpoint regret and measured runtime"
-    },
-    {
-      "id": "lunar_12d",
-      "status": "complete",
-      "scope": "12D controller tuning across acquisitions; 30 paired runs; LogEI held-out comparison on 200 shared terrains"
-    },
-    {
-      "id": "yahpo_highdim_hpo",
-      "status": "complete",
-      "scope": "14D XGBoost and 28D joint tuning tasks; four acquisitions; 30 paired runs"
-    }
-  ],
+  "as_of": "2026-10-07",
+  "synthetic": {
+    "objectives": 6,
+    "acquisitions": [
+      "GP-UCB",
+      "LogEI",
+      "GP-TS"
+    ],
+    "seeds": 20,
+    "exploration_rule": "Uniform",
+    "selected_and_common_alpha": true
+  },
+  "hpo": {
+    "tasks": [
+      "car",
+      "sylvine"
+    ],
+    "seeds": 30,
+    "contrasts": [
+      "Uniform over Standard",
+      "Greedy Packing over Standard"
+    ]
+  },
+  "lunar": {
+    "seeds": 30,
+    "terrains_per_evaluation": 50,
+    "heldout_included": false
+  },
+  "runtime": {
+    "seeds": 15,
+    "methods": [
+      "Standard",
+      "Uniform",
+      "MVR"
+    ],
+    "mvr": "scheduled posterior variance maximization; GP-UCB otherwise"
+  },
   "excluded": [
-    "large per-iteration trial collections",
-    "preliminary screens, grid-size checks, and superseded result snapshots",
-    "machine-specific launch scripts, paths, logs, and credentials",
-    "the manuscript source and local paper build"
+    "manuscript",
+    "motivating example",
+    "held-out terrain analysis",
+    "raw trial histories",
+    "rollout media"
   ],
-  "notes": [
-    "The current paper-facing synthetic snapshot uses 20 paired runs.",
-    "Runtime values are machine and load dependent; paired comparisons are the intended use.",
-    "Only result sets used by the current manuscript are included."
-  ]
+  "rebuild_limitations": "Application trajectory figure is exported; raw histories required to rebuild."
 }

@@ -1,5 +1,0 @@
-PASS
-expected_trials=150
-valid_trials=150
-fixed_signal_variance=True
-paired_initial_designs=True

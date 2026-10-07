@@ -2,25 +2,6 @@
   "schema_version": 2,
   "benchmark_family": "YAHPO Gym real-data HPO surrogate",
   "tasks": {
-    "iaml_super_40981": {
-      "name": "iaml_super_40981",
-      "scenario": "iaml_super",
-      "instance": "40981",
-      "dataset_name": "OpenML-40981",
-      "target": "logloss",
-      "expected_dim": 28,
-      "parameters": [],
-      "constants": [
-        [
-          "task_id",
-          "40981"
-        ],
-        [
-          "trainsize",
-          1.0
-        ]
-      ]
-    },
     "iaml_super_41146": {
       "name": "iaml_super_41146",
       "scenario": "iaml_super",
@@ -44,8 +25,7 @@
   "acquisitions": [
     "ucb",
     "logei",
-    "ts",
-    "mes_gumbel"
+    "ts"
   ],
   "ucb_beta_modes": [
     "constant"

@@ -1,1 +1,1 @@
-PASS trials=1080, budget=120, rows=129600, n_initial=[10], signal_variance=1, paired_initial_design=true
+PASS released subset: one task, three acquisitions, three methods, 30 seeds; six comparisons against Standard.

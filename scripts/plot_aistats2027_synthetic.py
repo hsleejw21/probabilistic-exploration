@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild the released eight-benchmark synthetic figures from aggregates."""
+"""Rebuild the released six-benchmark synthetic figures from aggregates."""
 
 from __future__ import annotations
 
@@ -16,8 +16,6 @@ import pandas as pd
 
 
 PANELS = (
-    ("Hartmann", 6),
-    ("Griewank", 10),
     ("Trid", 10),
     ("Rosenbrock", 20),
     ("Shifted Bent Cigar", 30),
@@ -55,9 +53,9 @@ def panel_rows(frame: pd.DataFrame, benchmark: str, dimension: int) -> pd.DataFr
     ]
 
 
-def plot_main(trajectories: pd.DataFrame, output: Path) -> None:
+def plot_main(trajectories: pd.DataFrame, output: Path, fixed: bool = False) -> None:
     configure()
-    fig, axes = plt.subplots(2, 4, figsize=(7.35, 4.28), sharex=True)
+    fig, axes = plt.subplots(2, 3, figsize=(7.35, 4.28), sharex=True)
     for index, (axis, (benchmark, dimension)) in enumerate(zip(axes.flat, PANELS)):
         panel = panel_rows(trajectories, benchmark, dimension)
         selected: dict[str, str] = {}
@@ -77,7 +75,7 @@ def plot_main(trajectories: pd.DataFrame, output: Path) -> None:
                         f"{acquisition}/{method}"
                     )
                 if method == "uniform":
-                    selected[acquisition] = str(rows["alpha"].iloc[0])
+                    selected[acquisition] = "1/2" if fixed else str(rows["alpha"].iloc[0])
                 x = rows["bo_iteration"].to_numpy()
                 mean = rows["mean"].to_numpy()
                 sd = rows["sd"].to_numpy()
@@ -106,8 +104,9 @@ def plot_main(trajectories: pd.DataFrame, output: Path) -> None:
         axis.text(
             0.5,
             1.025,
-            rf"$\alpha^*$: GP-UCB {selected['ucb']} $\cdot$ "
-            rf"LogEI {selected['logei']} $\cdot$ GP-TS {selected['ts']}",
+            (r"$\alpha=1/2$" if fixed else
+             rf"$\alpha^*$: GP-UCB {selected['ucb']} $\cdot$ "
+             rf"LogEI {selected['logei']} $\cdot$ GP-TS {selected['ts']}"),
             transform=axis.transAxes,
             ha="center",
             va="bottom",
@@ -120,13 +119,13 @@ def plot_main(trajectories: pd.DataFrame, output: Path) -> None:
         axis.grid(which="minor", axis="y", color="#E2E8F0", linewidth=0.25)
         axis.set_axisbelow(True)
         axis.spines[["top", "right"]].set_visible(False)
-        if index >= 4:
+        if index >= 3:
             axis.set_xlabel("BO evaluations")
-        if index % 4 == 0:
+        if index % 3 == 0:
             axis.set_ylabel("Mean inference regret")
 
     fig.subplots_adjust(
-        left=0.072, right=0.995, top=0.925, bottom=0.225,
+        left=0.072, right=0.995, top=0.925, bottom=0.250,
         wspace=0.31, hspace=0.54,
     )
     fig.legend(
@@ -148,7 +147,7 @@ def plot_main(trajectories: pd.DataFrame, output: Path) -> None:
         loc="lower center", bbox_to_anchor=(0.5, 0.014), ncol=3,
         frameon=False, handlelength=2.18, fontsize=9.0,
     )
-    save(fig, output / "fig_main_synthetic")
+    save(fig, output / ("fig_appendix_synthetic_uniform_alpha_half" if fixed else "fig_appendix_synthetic_selected_alpha"))
 
 
 def plot_sweep(
@@ -157,7 +156,7 @@ def plot_sweep(
     configure()
     label = "Uniform" if rule == "Uniform PE" else "Greedy Packing"
     style = "-" if rule == "Uniform PE" else "-."
-    fig, axes = plt.subplots(2, 4, figsize=(7.35, 4.15), sharex=True)
+    fig, axes = plt.subplots(2, 3, figsize=(7.35, 4.15), sharex=True)
     for index, (axis, (benchmark, dimension)) in enumerate(zip(axes.flat, PANELS)):
         for acquisition in ("GP-UCB", "LogEI", "GP-TS"):
             rows = panel_rows(sweep, benchmark, dimension)
@@ -171,11 +170,10 @@ def plot_sweep(
             acq_key = {"GP-UCB": "ucb", "LogEI": "logei", "GP-TS": "ts"}[acquisition]
             color = ACQ_COLOR[acq_key]
             x = np.arange(len(ALPHAS))
-            axis.errorbar(
-                x, mean, yerr=np.vstack([np.minimum(sd, mean * 0.94), sd]),
-                color=color, linestyle=style, marker="o", markersize=2.4,
-                linewidth=1.25, elinewidth=0.65, capsize=1.3,
-            )
+            axis.fill_between(x, np.maximum(mean - sd, 1e-6), mean + sd,
+                              color=color, alpha=0.14, linewidth=0)
+            axis.plot(x, mean, color=color, linestyle=style, marker="o",
+                      markersize=2.4, linewidth=1.25)
             standard = panel_rows(endpoints, benchmark, dimension)
             standard = standard[standard["acquisition"].eq(acquisition)][
                 "standard_mean"
@@ -195,12 +193,12 @@ def plot_sweep(
         axis.grid(which="minor", axis="y", color="#E2E8F0", linewidth=0.25)
         axis.set_axisbelow(True)
         axis.spines[["top", "right"]].set_visible(False)
-        if index >= 4:
+        if index >= 3:
             axis.set_xlabel(r"Exploration exponent $\alpha$")
-        if index % 4 == 0:
+        if index % 3 == 0:
             axis.set_ylabel("Final inference regret")
     fig.subplots_adjust(
-        left=0.073, right=0.992, top=0.95, bottom=0.225,
+        left=0.073, right=0.992, top=0.95, bottom=0.250,
         wspace=0.30, hspace=0.40,
     )
     fig.legend(
@@ -223,7 +221,7 @@ def plot_sweep(
         frameon=False, handlelength=2.0,
     )
     slug = "uniform" if rule == "Uniform PE" else "greedy_packing"
-    save(fig, output / f"fig_appendix_synthetic_{slug}_alpha")
+    save(fig, output / "fig_main_synthetic_alpha_sweep")
 
 
 def save(fig: plt.Figure, stem: Path) -> None:
@@ -235,7 +233,7 @@ def save(fig: plt.Figure, stem: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    default = Path("results/synthetic/eight_benchmark_alpha_sweep")
+    default = Path("results/synthetic/six_benchmark_alpha_sweep")
     parser.add_argument("--results-dir", type=Path, default=default)
     parser.add_argument("--output-dir", type=Path, default=None)
     args = parser.parse_args()
@@ -245,7 +243,7 @@ def main() -> None:
     endpoints = pd.read_csv(args.results_dir / "selected_uniform_endpoints.csv")
     plot_main(trajectories, output)
     plot_sweep(sweep, endpoints, "Uniform PE", output)
-    plot_sweep(sweep, endpoints, "Greedy PE", output)
+    plot_main(pd.read_csv(args.results_dir / "alpha_half_trajectory_summary.csv"), output, fixed=True)
 
 
 if __name__ == "__main__":

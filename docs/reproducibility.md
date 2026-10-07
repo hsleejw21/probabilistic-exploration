@@ -31,14 +31,12 @@ pip install -e '.[lunar]'
 
 The controller objective follows the Lunar Lander example distributed with
 TuRBO. Each candidate controller is evaluated on 50 terrains fixed within an
-optimization run; the held-out analysis uses 200 shared unseen terrains per
-final controller.
+optimization run. Held-out terrain results are not part of this paper release.
 
 ## Synthetic paper protocol
 
 `scripts/run_aistats2027_synthetic.sh` records the complete current synthetic
-matrix: eight objectives, GP-UCB/LogEI/GP-TS, Standard, five Uniform schedules,
-and five Greedy Packing schedules. The runner writes one CSV per trial and
+matrix: six objectives, GP-UCB/LogEI/GP-TS, Standard and five Uniform schedules. The runner writes one CSV per trial and
 skips completed trials when restarted.
 
 Run the acquisitions separately:
@@ -71,8 +69,10 @@ Large raw trial histories are excluded. The current synthetic result directory
 contains:
 
 - `trajectory_summary.csv`: 400-step mean and standard deviation curves;
-- `alpha_sweep_summary.csv`: endpoints for all five exponents and both rules;
-- `selected_uniform_endpoints.csv`: paired endpoint comparisons for Figure 1;
+- `alpha_sweep_summary.csv`: Uniform endpoints for all five exponents;
+- `selected_uniform_endpoints.csv`: paired endpoint comparisons at selected exponents;
+- `alpha_half_trajectory_summary.csv`: trajectories with alpha=1/2;
+- `alpha_half_endpoints.csv`: paired endpoints with alpha=1/2;
 - `protocol.json`: a machine-readable record of the released snapshot.
 
 Rebuild all three synthetic figures from these aggregates:
@@ -81,7 +81,7 @@ Rebuild all three synthetic figures from these aggregates:
 python scripts/plot_aistats2027_synthetic.py
 ```
 
-YAHPO endpoint comparisons and Lunar held-out comparisons are also rebuilt
+YAHPO endpoint comparisons are also rebuilt
 from released aggregates by `scripts/plot_application_results.py`. Rebuild the
 complete aggregate-backed figure set with:
 
@@ -98,7 +98,7 @@ focuses its one-command rebuild on figures supported by released inputs.
 
 The appendix runtime comparison uses Ackley 2D and Rastrigin 2D with GP-UCB,
 two initial observations, 400 BO evaluations, and 15 paired seeds. Standard
-uses GP-UCB at every round. Uniform PE and MVR PE share the `alpha=1/2`
+uses GP-UCB at every round. Uniform and MVR share the `alpha=1/2`
 exploration decisions; MVR optimizes posterior variance on those rounds.
 
 Rebuild the released figure from its compact per-seed aggregate:
@@ -127,5 +127,6 @@ paths, hostnames, credentials, or machine-specific output directories. Git
 remote URLs and commit authorship are separate hosting metadata; use a fresh
 anonymous remote with clean metadata for double-blind review.
 
-The release contains only the result sets used by the current manuscript.
-Earlier pilot studies, grid-size checks, and superseded snapshots are omitted.
+The synthetic release follows the six-benchmark paper scope. Application CSVs
+may retain additional optimization-run diagnostics; only the documented paper
+comparisons are plotted. Held-out data and MES-Gumbel result blocks are omitted.

@@ -1,14 +1,14 @@
 # Low-dimensional MVR runtime comparison
 
 This directory contains the public aggregate for the appendix comparison of
-Standard GP-UCB, Uniform PE, and maximum-variance exploration (MVR) PE.
+Standard GP-UCB, Uniform, and maximum-variance exploration (MVR).
 
 ## Protocol
 
 - shifted Ackley 2D and rotated, shifted Rastrigin 2D;
 - two scrambled-Sobol initial observations followed by 400 BO evaluations;
 - GP-UCB with posterior-standard-deviation multiplier 2;
-- Uniform PE and MVR PE use the same
+- Uniform and MVR use the same
   `min(1, log(t+1)/(t+1)^alpha)` schedule with `alpha=1/2`;
 - 15 paired seeds shared across the three methods;
 - MVR maximizes posterior variance with the same 20-start continuous optimizer

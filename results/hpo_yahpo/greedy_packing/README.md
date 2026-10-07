@@ -1,20 +1,6 @@
-# Greedy Packing on YAHPO
+# YAHPO application comparisons
 
-These results compare Standard BO, Uniform PE, and finite-grid Greedy Packing
-PE under matched YAHPO protocols. All three policies share the same initial
-observations within each task, acquisition, and seed. The PE arms use
-`alpha=1/2`; only the exploration-point rule differs.
-
-The released comparison uses 30 paired seeds (`5--34`) and the default grid
-`|G_t| = 256 + ceil(16 t)`. Its aggregates are under `default/`.
-
-The 14D studies use three XGBoost tasks, 120 evaluation steps, and ten initial
-points. The 28D studies use two `iaml_super` tasks, 200 evaluation steps, and
-ten initial points. Both include GP-UCB, theory-aligned GP-TS, LogEI, and
-MES-Gumbel. Signal variance is fixed at one.
-
-YAHPO returns a loss. In `paired_comparisons.csv`, the stored difference is
-candidate loss minus baseline loss, so a negative value favors the candidate.
-Publication figures convert this to a positive-is-better loss improvement.
-Raw evaluation histories are omitted; each dimension retains the protocol, audit,
-endpoint summary, trial summary, and paired comparisons.
+Released CSVs cover car (14D) and sylvine (28D), 30 seeds, and GP-UCB,
+LogEI and GP-TS. Both exploration rules use alpha=1/2. Comparisons use
+Standard as the reference; positive plotted improvement means lower loss.
+Run `python scripts/plot_application_results.py` from the repository root.

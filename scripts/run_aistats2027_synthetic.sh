@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Reproduce the current eight-benchmark synthetic sweep. Run one acquisition
+# Reproduce the current six-benchmark synthetic sweep. Run one acquisition
 # per process so completed trial CSVs can be resumed independently.
 acquisition="${1:?usage: $0 ucb|logei|ts [output-root] [seed-start] [num-seeds] [jobs]}"
 output_root="${2:-results/reproduction/aistats2027_synthetic}"
@@ -22,8 +22,6 @@ export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
 
 objectives=(
-  hartmann6_active_6d
-  griewank_mean_shifted_10d
   trid_normalized_10d
   rosenbrock_mean_20d
   bent_cigar_shifted_30d
@@ -37,9 +35,6 @@ policies=(
   decay_uniform_grid_a1_4 decay_uniform_grid_a1_3
   decay_uniform_grid_a1_2 decay_uniform_grid_a2_3
   decay_uniform_grid_a3_4
-  decay_greedy_packing_grid_a1_4 decay_greedy_packing_grid_a1_3
-  decay_greedy_packing_grid_a1_2 decay_greedy_packing_grid_a2_3
-  decay_greedy_packing_grid_a3_4
 )
 
 python scripts/run_synthetic.py \

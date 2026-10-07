@@ -6,11 +6,20 @@
   "n_initial": 24,
   "bo_seeds": 30,
   "terrains_per_evaluation": 50,
-  "heldout_terrains_per_controller": 200,
   "signal_variance": 1.0,
   "learn_signal_variance": false,
-  "acquisitions": ["logei", "ucb", "mes_gumbel", "ts"],
-  "policies": ["standard", "decay_alpha_0.5", "decay_alpha_0.6667", "decay_alpha_1.0", "fixed_p_0.2"],
+  "acquisitions": [
+    "logei",
+    "ucb",
+    "ts"
+  ],
+  "policies": [
+    "standard",
+    "decay_alpha_0.5",
+    "decay_alpha_0.6667",
+    "decay_alpha_1.0",
+    "fixed_p_0.2"
+  ],
   "gp_ts": {
     "beta": "log(t + 1)",
     "candidate_design": "fresh_scrambled_sobol",

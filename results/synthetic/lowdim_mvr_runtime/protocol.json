@@ -1,5 +1,5 @@
 {
-  "study": "low-dimensional Uniform PE and MVR runtime comparison",
+  "study": "low-dimensional Uniform and MVR runtime comparison",
   "objectives": [
     "ackley_shifted_narrow_2d",
     "rastrigin_mean_rotated_shifted_2d"
@@ -9,8 +9,8 @@
   "ucb_posterior_standard_deviation_multiplier": 2.0,
   "methods": {
     "Standard": "GP-UCB at every BO round",
-    "Uniform": "Uniform PE with alpha=1/2",
-    "MVR": "Posterior-variance-maximizing PE with alpha=1/2"
+    "Uniform": "Uniform with alpha=1/2",
+    "MVR": "Scheduled posterior-variance maximization with alpha=1/2"
   },
   "schedule": "min(1, log(t+1)/(t+1)^alpha)",
   "alpha": 0.5,

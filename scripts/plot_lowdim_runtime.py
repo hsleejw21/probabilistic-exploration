@@ -15,7 +15,7 @@ import pandas as pd
 
 
 METHODS = ("Standard", "Uniform", "MVR")
-DISPLAY_METHODS = ("Standard", "Uniform PE", "MVR PE")
+DISPLAY_METHODS = METHODS
 OBJECTIVES = (
     "ackley_shifted_narrow_2d",
     "rastrigin_mean_rotated_shifted_2d",

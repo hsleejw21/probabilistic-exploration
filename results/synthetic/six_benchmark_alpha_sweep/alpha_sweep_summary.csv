@@ -1,0 +1,91 @@
+benchmark,dimension,acquisition,pe_rule,alpha,n_seeds,mean_final_inference_regret,std_final_inference_regret,variance_final_inference_regret,is_selected_alpha,result_stage
+Rosenbrock,20,GP-UCB,Uniform PE,1/4,20,0.05649605,0.01043378,0.00010886,True,full_alpha_sweep_20_seed
+Rosenbrock,20,GP-UCB,Uniform PE,1/3,20,0.07700661,0.01871807,0.00035037,False,full_alpha_sweep_20_seed
+Rosenbrock,20,GP-UCB,Uniform PE,1/2,20,0.12644472,0.03950501,0.00156065,False,full_alpha_sweep_20_seed
+Rosenbrock,20,GP-UCB,Uniform PE,2/3,20,0.14607225,0.03154638,0.00099517,False,full_alpha_sweep_20_seed
+Rosenbrock,20,GP-UCB,Uniform PE,3/4,20,0.13606514,0.03752677,0.00140826,False,full_alpha_sweep_20_seed
+Rosenbrock,20,LogEI,Uniform PE,1/4,20,0.05690981,0.01056541,0.00011163,True,full_alpha_sweep_20_seed
+Rosenbrock,20,LogEI,Uniform PE,1/3,20,0.09812495,0.03123006,0.00097532,False,full_alpha_sweep_20_seed
+Rosenbrock,20,LogEI,Uniform PE,1/2,20,0.12033748,0.02705632,0.00073204,False,full_alpha_sweep_20_seed
+Rosenbrock,20,LogEI,Uniform PE,2/3,20,0.08392935,0.01664368,0.00027701,False,full_alpha_sweep_20_seed
+Rosenbrock,20,LogEI,Uniform PE,3/4,20,0.08664534,0.02254922,0.00050847,False,full_alpha_sweep_20_seed
+Rosenbrock,20,GP-TS,Uniform PE,1/4,20,0.06073902,0.01446557,0.00020925,True,selected_alpha_20_seed
+Rosenbrock,20,GP-TS,Uniform PE,1/3,20,0.06183419,0.01484452,0.00022036,False,completed_alpha_sweep_20_seed
+Rosenbrock,20,GP-TS,Uniform PE,1/2,20,0.07371699,0.01345079,0.00018092,False,completed_alpha_sweep_20_seed
+Rosenbrock,20,GP-TS,Uniform PE,2/3,20,0.07506472,0.01382936,0.00019125,False,completed_alpha_sweep_20_seed
+Rosenbrock,20,GP-TS,Uniform PE,3/4,20,0.08059682,0.01336365,0.00017859,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-UCB,Uniform PE,1/4,20,0.10438409,0.03533793,0.00124877,True,selected_alpha_20_seed
+Shifted Bent Cigar,30,GP-UCB,Uniform PE,1/3,20,0.20116403,0.04887641,0.0023889,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-UCB,Uniform PE,1/2,20,0.46217117,0.10592419,0.01121993,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-UCB,Uniform PE,2/3,20,0.79342782,0.33937229,0.11517355,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-UCB,Uniform PE,3/4,20,0.80362271,0.29717204,0.08831122,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,LogEI,Uniform PE,1/4,20,0.10471811,0.03437982,0.00118197,True,selected_alpha_20_seed
+Shifted Bent Cigar,30,LogEI,Uniform PE,1/3,20,0.221741,0.04244086,0.00180123,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,LogEI,Uniform PE,1/2,20,0.34789428,0.09410392,0.00885555,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,LogEI,Uniform PE,2/3,20,0.19458234,0.0545534,0.00297607,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,LogEI,Uniform PE,3/4,20,0.21511417,0.07022693,0.00493182,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-TS,Uniform PE,1/4,20,0.10367367,0.03404115,0.0011588,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-TS,Uniform PE,1/3,20,0.10236237,0.03314897,0.00109885,True,selected_alpha_20_seed
+Shifted Bent Cigar,30,GP-TS,Uniform PE,1/2,20,0.11392364,0.03651869,0.00133361,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-TS,Uniform PE,2/3,20,0.13498289,0.02999103,0.00089946,False,completed_alpha_sweep_20_seed
+Shifted Bent Cigar,30,GP-TS,Uniform PE,3/4,20,0.14474722,0.03447873,0.00118878,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-UCB,Uniform PE,1/4,20,0.09938517,0.02011955,0.0004048,True,selected_alpha_20_seed
+Sphere,30,GP-UCB,Uniform PE,1/3,20,0.18712871,0.0512315,0.00262467,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-UCB,Uniform PE,1/2,20,0.50392098,0.13580687,0.01844351,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-UCB,Uniform PE,2/3,20,0.83722065,0.29181509,0.08515605,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-UCB,Uniform PE,3/4,20,0.88736214,0.25822418,0.06667972,False,completed_alpha_sweep_20_seed
+Sphere,30,LogEI,Uniform PE,1/4,20,0.09799434,0.02000234,0.00040009,True,selected_alpha_20_seed
+Sphere,30,LogEI,Uniform PE,1/3,20,0.2113483,0.05717601,0.0032691,False,completed_alpha_sweep_20_seed
+Sphere,30,LogEI,Uniform PE,1/2,20,0.38149094,0.15194726,0.02308797,False,completed_alpha_sweep_20_seed
+Sphere,30,LogEI,Uniform PE,2/3,20,0.17359591,0.04138431,0.00171266,False,completed_alpha_sweep_20_seed
+Sphere,30,LogEI,Uniform PE,3/4,20,0.20586581,0.04892633,0.00239379,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-TS,Uniform PE,1/4,20,0.09790748,0.02276456,0.00051823,True,selected_alpha_20_seed
+Sphere,30,GP-TS,Uniform PE,1/3,20,0.10299562,0.02048207,0.00041952,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-TS,Uniform PE,1/2,20,0.12025721,0.03462589,0.00119895,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-TS,Uniform PE,2/3,20,0.12558229,0.03460351,0.0011974,False,completed_alpha_sweep_20_seed
+Sphere,30,GP-TS,Uniform PE,3/4,20,0.11791539,0.02465017,0.00060763,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-UCB,Uniform PE,1/4,20,0.44858481,0.08321159,0.00692417,True,selected_alpha_20_seed
+Griewank,30,GP-UCB,Uniform PE,1/3,20,0.5821444,0.14868604,0.02210754,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-UCB,Uniform PE,1/2,20,2.59035462,0.44247527,0.19578437,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-UCB,Uniform PE,2/3,20,4.7763126,0.70060349,0.49084525,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-UCB,Uniform PE,3/4,20,5.62630217,0.76308052,0.58229188,False,completed_alpha_sweep_20_seed
+Griewank,30,LogEI,Uniform PE,1/4,20,0.44858481,0.08321159,0.00692417,True,selected_alpha_20_seed
+Griewank,30,LogEI,Uniform PE,1/3,20,0.59663471,0.13488702,0.01819451,False,completed_alpha_sweep_20_seed
+Griewank,30,LogEI,Uniform PE,1/2,20,1.89573114,0.59763121,0.35716306,False,completed_alpha_sweep_20_seed
+Griewank,30,LogEI,Uniform PE,2/3,20,1.7991287,0.95682545,0.91551494,False,completed_alpha_sweep_20_seed
+Griewank,30,LogEI,Uniform PE,3/4,20,1.45731638,0.60631758,0.36762101,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-TS,Uniform PE,1/4,20,0.44942333,0.08804807,0.00775246,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-TS,Uniform PE,1/3,20,0.53536674,0.12687495,0.01609725,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-TS,Uniform PE,1/2,20,0.49497215,0.12513242,0.01565812,True,selected_alpha_20_seed
+Griewank,30,GP-TS,Uniform PE,2/3,20,0.5047318,0.11348806,0.01287954,False,completed_alpha_sweep_20_seed
+Griewank,30,GP-TS,Uniform PE,3/4,20,0.47009289,0.15097806,0.02279437,False,completed_alpha_sweep_20_seed
+Trid,10,GP-UCB,Uniform PE,1/4,20,0.01343322,0.00485742,2.359e-05,True,completed_alpha_sweep_20_seed
+Trid,10,GP-UCB,Uniform PE,1/3,20,0.02802571,0.01388727,0.00019286,False,completed_alpha_sweep_20_seed
+Trid,10,GP-UCB,Uniform PE,1/2,20,0.02796993,0.01185041,0.00014043,False,completed_alpha_sweep_20_seed
+Trid,10,GP-UCB,Uniform PE,2/3,20,0.02855552,0.01308347,0.00017118,False,completed_alpha_sweep_20_seed
+Trid,10,GP-UCB,Uniform PE,3/4,20,0.02671301,0.01525678,0.00023277,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-UCB,Uniform PE,1/4,20,0.00300241,0.00351748,1.237e-05,True,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-UCB,Uniform PE,1/3,20,0.00450783,0.00451163,2.035e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-UCB,Uniform PE,1/2,20,0.0063415,0.00588757,3.466e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-UCB,Uniform PE,2/3,20,0.00822278,0.008351,6.974e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-UCB,Uniform PE,3/4,20,0.00503858,0.00306881,9.42e-06,False,completed_alpha_sweep_20_seed
+Trid,10,LogEI,Uniform PE,1/4,20,0.01274291,0.00435345,1.895e-05,True,completed_alpha_sweep_20_seed
+Trid,10,LogEI,Uniform PE,1/3,20,0.02307114,0.01120626,0.00012558,False,completed_alpha_sweep_20_seed
+Trid,10,LogEI,Uniform PE,1/2,20,0.0269302,0.00861137,7.416e-05,False,completed_alpha_sweep_20_seed
+Trid,10,LogEI,Uniform PE,2/3,20,0.03554509,0.01351447,0.00018264,False,completed_alpha_sweep_20_seed
+Trid,10,LogEI,Uniform PE,3/4,20,0.03086514,0.01370397,0.0001878,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,LogEI,Uniform PE,1/4,20,0.00322065,0.00377065,1.422e-05,True,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,LogEI,Uniform PE,1/3,20,0.00825054,0.00864938,7.481e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,LogEI,Uniform PE,1/2,20,0.00678089,0.00875242,7.66e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,LogEI,Uniform PE,2/3,20,0.01512397,0.01011932,0.0001024,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,LogEI,Uniform PE,3/4,20,0.01076929,0.00840324,7.061e-05,False,completed_alpha_sweep_20_seed
+Trid,10,GP-TS,Uniform PE,1/4,20,0.01280007,0.00427513,1.828e-05,True,completed_alpha_sweep_20_seed
+Trid,10,GP-TS,Uniform PE,1/3,20,0.01286559,0.0072794,5.299e-05,False,completed_alpha_sweep_20_seed
+Trid,10,GP-TS,Uniform PE,1/2,20,0.02424438,0.01226667,0.00015047,False,completed_alpha_sweep_20_seed
+Trid,10,GP-TS,Uniform PE,2/3,20,0.01842952,0.01025124,0.00010509,False,completed_alpha_sweep_20_seed
+Trid,10,GP-TS,Uniform PE,3/4,20,0.02166118,0.01200516,0.00014412,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-TS,Uniform PE,1/4,20,0.00322413,0.00360087,1.297e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-TS,Uniform PE,1/3,20,0.0023938,0.00294479,8.67e-06,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-TS,Uniform PE,1/2,20,0.00260393,0.00314607,9.9e-06,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-TS,Uniform PE,2/3,20,0.00336556,0.00458744,2.104e-05,False,completed_alpha_sweep_20_seed
+Sum of Different Powers,30,GP-TS,Uniform PE,3/4,20,0.00234615,0.00351,1.232e-05,True,completed_alpha_sweep_20_seed

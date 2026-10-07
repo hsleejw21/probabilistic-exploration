@@ -1,110 +1,62 @@
 # Probabilistic Exploration for Efficient Bayesian Optimization
 
-This repository contains the implementation and released experiment artifacts
-for probabilistic exploration (PE) in Bayesian optimization. At BO round
-\(t\), PE replaces the base acquisition query with an explicit exploration
-query with probability
+Code and compact experimental results for exploration-aided Bayesian optimization.
+At round t, the algorithm selects an exploration query with probability
+`min(1, log(t+1)/(t+1)^alpha)` and otherwise follows the base acquisition rule.
+**Standard** uses the base acquisition at every round. **Uniform** samples an
+exploration point uniformly; **Greedy Packing** uses a nested Sobol candidate
+set and is evaluated in the applications.
 
-\[
-p_t=\min\left\{1,\frac{\log(t+1)}{(t+1)^\alpha}\right\}.
-\]
+## Paper experiments
 
-The current paper snapshot evaluates two exploration rules:
+- **Six synthetic benchmarks:** Trid 10D, Rosenbrock 20D, shifted Bent Cigar,
+  shifted Sphere, shifted Griewank, and normalized Sum of Different Powers (30D).
+  GP-UCB, LogEI, and GP-TS; two initial observations plus 400 BO evaluations;
+  20 seeds; Uniform exponents 1/4, 1/3, 1/2, 2/3, and 3/4.
+- **YAHPO:** car (14D, 120 total evaluations) and sylvine (28D, 200 total),
+  ten initial observations, 30 seeds, and alpha=1/2. Endpoint comparisons use
+  GP-UCB, LogEI, and GP-TS and compare each exploration rule with Standard.
+- **Lunar Lander:** 12 controller parameters, 400 total evaluations including
+  24 initial points, and 30 seeds. Each evaluation averages 50 terrains fixed
+  within a run. The main LogEI comparison includes Uniform and Greedy Packing.
+- **Runtime:** shifted Ackley 2D and shifted, rotated Rastrigin 2D; GP-UCB;
+  two initial observations plus 400 evaluations; 15 seeds. Uniform and MVR
+  share exploration decisions at alpha=1/2. MVR maximizes posterior variance
+  only on exploration rounds; both use GP-UCB on other rounds.
 
-- **Uniform:** sample the exploration point uniformly from the search space.
-- **Greedy Packing:** select the point farthest from evaluated inputs on a
-  nested Sobol candidate grid.
+With selected exponents, Uniform improves mean synthetic endpoint regret in
+17/18 comparisons (16 pointwise bootstrap intervals exclude zero). With
+alpha=1/2, it improves 16/18 (11 intervals exclude zero; no conclusive losses).
+Selection and evaluation use the same 20 runs; selected results describe the
+observed sweep rather than independent validation of a tuned policy.
 
-Both rules wrap GP-UCB, LogEI, or GP-TS without changing the acquisition on
-the remaining rounds. **Standard** denotes the base acquisition with no PE.
-
-## Current empirical scope
-
-### Synthetic optimization
-
-The main synthetic study uses eight objectives from 6D to 30D, three
-acquisitions, 400 BO evaluations after two shared initial observations, and 20
-paired runs per setting. It evaluates
-\(\alpha\in\{1/4,1/3,1/2,2/3,3/4\}\) for both Uniform and Greedy Packing.
-
-For the Uniform schedule selected by mean final inference regret within this
-five-value sweep:
-
-- Uniform has lower mean endpoint regret than Standard in 23 of 24
-  objective-acquisition comparisons.
-- Pointwise paired bootstrap 95% intervals exclude zero in 21 comparisons.
-- \(\alpha=1/4\) is selected in 16 of 24 comparisons, while Hartmann 6D and
-  several lower-dimensional settings favor less persistent exploration.
-
-The selected schedule is evaluated on the same runs used for selection. These
-numbers describe the observed sweep and are not an out-of-sample tuning claim.
-All five Uniform and Greedy Packing schedules are included in the release.
-
-### Applied studies
-
-- **YAHPO Gym:** three 14D XGBoost tasks and two 28D joint-tuning tasks, with
-  30 paired runs. Effects depend on task and acquisition; the clearest gains
-  occur on the `car` and `sylvine` tasks.
-- **Lunar Lander:** a 12-parameter controller with 30 paired runs. Uniform and
-  Greedy Packing improve the LogEI controller on 200 shared held-out terrains;
-  their direct difference is inconclusive.
-
-### Computational comparison
-
-The release also includes a 15-seed comparison of Standard GP-UCB, Uniform PE,
-and posterior-variance-maximizing PE on Ackley 2D and Rastrigin 2D. Uniform PE
-has the lowest mean runtime on both objectives because a random PE query avoids
-continuous acquisition or variance optimization on exploration rounds. The
-released per-seed aggregate records both final inference regret and measured
-end-to-end optimizer runtime.
-
-## Repository map
-
-```text
-src/probabilistic_exploration/  BO, GP, PE, and benchmark implementation
-scripts/                        experiment and plotting entry points
-configs/                        recorded experiment protocols
-results/                        aggregate results, audits, and figures
-docs/                           method and reproducibility notes
-```
-
-The release omits large per-iteration trial collections, preliminary screens,
-machine-specific paths, and credentials. Aggregate trajectory data needed to
-rebuild the released synthetic figures is included.
-
-## Quick start
+## Reproduction
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[test]'
-pytest
-python scripts/run_synthetic.py \
-  --profile smoke --jobs 2 --output-dir /tmp/pe-smoke
-```
-
-Rebuild every figure supported by the released aggregate results with:
-
-```bash
 bash scripts/build_released_figures.sh
-```
-
-Run one acquisition block of the full eight-benchmark protocol with:
-
-```bash
+# Rerun one synthetic acquisition block:
 bash scripts/run_aistats2027_synthetic.sh ucb /tmp/aistats2027 0 20 12
 ```
 
-See [the method](docs/method.md), [reproduction notes](docs/reproducibility.md),
-the exact [AISTATS 2027 protocol](configs/aistats2027.yaml), and the
-[experiment index](results/README.md). The [script index](scripts/README.md)
-maps released figures to their experiment and plotting entry points and shows
-where to add new objectives, acquisitions, and exploration rules.
+The figure command rebuilds the six-panel schedule sweep, selected-exponent
+trajectories, alpha=1/2 trajectories, HPO endpoint comparison, and runtime figure.
+See [reproduction details](docs/reproducibility.md), [script index](scripts/README.md),
+and [protocol](configs/aistats2027.yaml). Add objectives in
+`src/probabilistic_exploration/benchmarks.py`, acquisitions in `acquisitions.py`,
+and exploration rules in `exploration.py`.
 
-The manuscript source and local paper build are intentionally excluded from
-this code release. Repository text and generated artifacts omit author names,
-institutional paths, hostnames, and credentials. Git hosting URLs and commit
-metadata are external to the repository contents and must also be anonymized
-when the repository is used for double-blind review.
+Results contain compact aggregates, not full raw trial histories. Main application
+trajectories and Lunar rollout media are not rebuildable from these aggregates;
+the current exported application figure is included for reference.
+The manuscript, motivating example, and held-out terrain analysis are excluded.
+Internal policy identifiers retain their original names for compatibility.
 
-The project license has not yet been specified.
+## Licenses and anonymity
+
+See [third-party assets](docs/third_party_assets.md). A license for the original
+project code has not yet been selected; no blanket license is granted here.
+Manuscript files and local paths are excluded. Git hosting and commit metadata
+must be anonymized by the anonymous mirror used for review.

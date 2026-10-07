@@ -53,8 +53,6 @@ def test_greedy_packing_uses_the_same_decay_schedule_as_uniform():
 
 def test_current_synthetic_benchmarks_and_alpha_grid_are_registered():
     objectives = {
-        "hartmann6_active_6d",
-        "griewank_mean_shifted_10d",
         "trid_normalized_10d",
         "rosenbrock_mean_20d",
         "bent_cigar_shifted_30d",
@@ -131,7 +129,7 @@ def test_public_figures_use_stable_semantic_colours_and_labels():
 def test_greedy_application_results_are_complete_and_audited():
     root = Path(__file__).resolve().parents[1] / "results"
     yahpo = root / "hpo_yahpo" / "greedy_packing"
-    expected_rows = {14: 36, 28: 24}
+    expected_rows = {14: 6, 28: 6}
     for dimension, expected_comparisons in expected_rows.items():
         directory = yahpo / "default" / f"{dimension}d"
         protocol = json.loads((directory / "protocol.json").read_text())
@@ -140,14 +138,8 @@ def test_greedy_application_results_are_complete_and_audited():
             assert len(list(csv.DictReader(handle))) == expected_comparisons
         assert (directory / "audit.txt").read_text().startswith("PASS ")
 
-    lunar = root / "lunar" / "greedy_packing"
-    protocol = json.loads((lunar / "protocol.json").read_text())
-    assert protocol["paired_training_seeds"] == 30
-    assert protocol["heldout_terrains_per_controller"] == 200
-    with (lunar / "default" / "paired_comparisons.csv").open(newline="") as handle:
-        assert len(list(csv.DictReader(handle))) == 9
     assert (root / "hpo_yahpo" / "figures" / "fig_appendix_hpo_acquisitions.pdf").is_file()
-    assert (root / "lunar" / "fig_appendix_lunar_heldout.pdf").is_file()
+    assert not (root / "lunar" / "greedy_packing").exists()
 
 
 def test_release_contains_only_current_result_families():
@@ -156,20 +148,16 @@ def test_release_contains_only_current_result_families():
         "hpo_yahpo",
         "lunar",
         "synthetic",
+        "figures",
     }
     synthetic = root / "synthetic"
     assert {path.name for path in synthetic.iterdir() if path.is_dir()} == {
-        "eight_benchmark_alpha_sweep",
+        "six_benchmark_alpha_sweep",
         "lowdim_mvr_runtime",
     }
     assert {
         path.name
         for path in (root / "hpo_yahpo" / "greedy_packing").iterdir()
-        if path.is_dir()
-    } == {"default"}
-    assert {
-        path.name
-        for path in (root / "lunar" / "greedy_packing").iterdir()
         if path.is_dir()
     } == {"default"}
 
@@ -178,30 +166,30 @@ def test_current_synthetic_release_is_complete():
         Path(__file__).resolve().parents[1]
         / "results"
         / "synthetic"
-        / "eight_benchmark_alpha_sweep"
+        / "six_benchmark_alpha_sweep"
     )
     protocol = json.loads((directory / "protocol.json").read_text())
-    assert len(protocol["objectives"]) == 8
+    assert len(protocol["objectives"]) == 6
     assert protocol["num_paired_runs"] == 20
     assert protocol["bo_evaluations"] == 400
 
     with (directory / "selected_uniform_endpoints.csv").open(newline="") as handle:
         endpoints = list(csv.DictReader(handle))
-    assert len(endpoints) == 24
-    assert sum(float(row["mean_gain"]) > 0 for row in endpoints) == 23
+    assert len(endpoints) == 18
+    assert sum(float(row["mean_gain"]) > 0 for row in endpoints) == 17
     assert sum(
         float(row["gain_ci_low"]) > 0 or float(row["gain_ci_high"]) < 0
         for row in endpoints
-    ) == 21
+    ) == 16
 
     with (directory / "alpha_sweep_summary.csv").open(newline="") as handle:
         sweep = list(csv.DictReader(handle))
-    assert len(sweep) == 8 * 3 * 2 * 5
+    assert len(sweep) == 6 * 3 * 5
     assert {row["n_seeds"] for row in sweep} == {"20"}
 
     with (directory / "trajectory_summary.csv").open(newline="") as handle:
         trajectories = list(csv.DictReader(handle))
-    assert len(trajectories) == 8 * 3 * 2 * 400
+    assert len(trajectories) == 6 * 3 * 2 * 400
     assert {row["n_seeds"] for row in trajectories} == {"20"}
 
 
